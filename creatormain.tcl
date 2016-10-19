@@ -29,14 +29,14 @@ proc setup_images_for_other_pages {} {
 		"espresso" "[skin_directory]/espresso_2.png" \
 		"espresso_1" "[skin_directory]/espresso_1.png" \
 		"espresso_3" "[skin_directory]/espresso_3.png" \
-		"steam" "[skin_directory]/steam_1.png" \
+		"steam" "[skin_directory]/steam_2.png" \
 		"steam_1" "[skin_directory]/steam_1.png" \
 		"steam_3" "[skin_directory]/steam_3.png" \
 		"water" "[skin_directory]/water_2.png" \
 		"water_1" "[skin_directory]/water_1.png" \
 		"water_3" "[skin_directory]/water_3.png" \
 		"preheat_1" "[skin_directory]/preheat_1.png" \
-		"preheat_2" "[skin_directory]/preheat_3.png" \
+		"preheat" "[skin_directory]/preheat_2.png" \
 		"preheat_3" "[skin_directory]/preheat_3.png" \
 		"preheat_4" "[skin_directory]/preheat_4.png" \
 		"settings" "[skin_directory]/settings_on.png" \
