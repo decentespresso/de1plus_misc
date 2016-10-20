@@ -25,10 +25,17 @@ add_de1_text "water water_1 water_3" 1665 100 -text [translate "STEAM"] -font He
 add_de1_text "water water_1 water_3" 2290 100 -text [translate "HOT WATER"] -font Helv_10_bold -fill "#2d3046" -anchor "center" 
 
 # buttons for moving between tabs, available at all times that the espresso machine is not doing something hot
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {pre-heat}] $::settings(sound_button_out);page_show preheat_1" 0 0 641 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {espresso}] $::settings(sound_button_out);page_show espresso_1" 642 0 1277 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {steam}] $::settings(sound_button_out);page_show steam_1" 1278 0 1904 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {water}] $::settings(sound_button_out);page_show water_1" 1905 0 2560 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {pre-heat}] $::settings(sound_button_out); page_show preheat_1" 0 0 641 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {espresso}] $::settings(sound_button_out); page_show espresso_1" 642 0 1277 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {steam}] $::settings(sound_button_out); page_show steam_1" 1278 0 1904 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {water}] $::settings(sound_button_out); page_show water_1" 1905 0 2560 188
+
+# when the espresso machine is doing something, the top tabs have to first stop that function, then the tab can change
+add_de1_button "preheat_2 steam water espresso" "say [translate {pre-heat}] $::settings(sound_button_out);set_next_page off preheat_1; start_idle" 0 0 641 188
+add_de1_button "preheat_2 steam water espresso" "say [translate {espresso}] $::settings(sound_button_out);set_next_page off espresso_1; start_idle" 642 0 1277 188
+add_de1_button "preheat_2 steam water espresso" "say [translate {steam}] $::settings(sound_button_out);set_next_page off steam_1; start_idle" 1278 0 1904 188
+add_de1_button "preheat_2 steam water espresso" "say [translate {water}] $::settings(sound_button_out);set_next_page off water_1; start_idle" 1905 0 2560 188
+
 
 # save/load/clear buttons
 add_de1_text "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" 1240 1520 -text [translate "Clear"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
@@ -101,7 +108,7 @@ add_de1_text "off espresso_1" 1710 1214 -text [espresso_frame_description 6] -fo
 # make and stop espresso button
 add_de1_button "off espresso_1" "say [translate {esspresso}] $::settings(sound_button_in);set_next_page off espresso_3; start_espresso" 1900 220 2560 850
 add_de1_button "espresso" "say [translate {stop}] $::settings(sound_button_in);set_next_page off espresso_3; start_idle" 1900 201 2560 1400
-add_de1_button "espresso" "say [translate {stop}] $::settings(sound_button_in);set_next_page off espresso_3; start_idle" 0 181 2560 200
+add_de1_button "espresso" "say [translate {stop}] $::settings(sound_button_in);set_next_page off espresso_3; start_idle" 0 189 2560 200
 add_de1_button "espresso" {say [translate {next step}] $::settings(sound_button_in); next_espresso_step } 0 1405 2560 1600
 add_de1_button "espresso_3" "page_show espresso_1" 0 189 2560 1422
 
@@ -156,6 +163,10 @@ if {$::settings(flight_mode_enable) == 1} {
 	add_de1_text "espresso" 1900 1370 -justify right -anchor "nw" -text [translate "Flight mode:"] -font Helv_8 -fill "#7f879a" -width 520
 	add_de1_variable "espresso" 2500 1370 -justify left -anchor "ne" -text "" -font Helv_8 -fill "#42465c" -width 520 -textvariable {[accelerometer_angle]º} 
 }
+
+add_de1_text "espresso_3" 1920 1270 -justify right -anchor "nw" -text [translate "Elapsed:"] -font Helv_8 -fill "#7f879a" -width 520
+add_de1_variable "espresso_3" 2460 1270 -justify left -anchor "ne" -font Helv_8 -text "" -fill "#42465c" -width 520 -textvariable {[timer][translate "s"]} 
+
 ##########################################################################################################################################################################################################################################################################
 
 
@@ -167,11 +178,11 @@ add_de1_text "preheat_2" 1390 805 -text [translate "STOP"] -font Helv_20_bold -f
 add_de1_text "preheat_3" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#7f879a" -anchor "center" 
 
 add_de1_button "preheat_1" "say {[translate {pre-heat cup}]} $::settings(sound_button_in); set_next_page water preheat_2; start_water" 1030 210 2560 1400
-add_de1_button "preheat_2" "say [translate {stop}] $::settings(sound_button_in); set_next_page off preheat_3; start_idle" 0 181 2560 1600
+add_de1_button "preheat_2" "say [translate {stop}] $::settings(sound_button_in); set_next_page off preheat_3; start_idle" 0 189 2560 1600
 add_de1_button "preheat_3" "set_next_page off preheat_1; page_show preheat_1" 0 189 2560 1422
 
 add_de1_text "preheat_1" 70 250 -text [translate "1) Choose: how much water and how hot?"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 900
-add_de1_text "preheat_1" 1070 250 -text [translate "2) Water will pour into your cup"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 650
+add_de1_text "preheat_1 preheat_2" 1070 250 -text [translate "2) Water will pour into your cup"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 650
 add_de1_text "preheat_1" 1840 250 -text [translate "3) Wait for hot water to warm your cup"] -font Helv_10 -fill "#b1b9cd" -anchor "nw" -width 680
 add_de1_text "preheat_3" 1840 250 -text [translate "3) Wait for hot water to warm your cup"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 680
 
@@ -185,6 +196,11 @@ add_de1_text "preheat_2 preheat_3" 300 1300  -text [translate "VOLUME"] -font He
 add_de1_text "preheat_2 preheat_3" 755 1250 -text [translate "90ºC"] -font Helv_10_bold -fill "#7f879a" -anchor "center" 
 add_de1_text "preheat_2 preheat_3" 755 1300 -text [translate "TEMP"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
 
+
+add_de1_text "preheat_3" 1880 1270 -justify right -anchor "nw" -text [translate "Elapsed:"] -font Helv_8 -fill "#7f879a" -width 520
+add_de1_variable "preheat_3" 2460 1270 -justify left -anchor "ne" -font Helv_8 -text "" -fill "#42465c" -width 520 -textvariable {[timer][translate "s"]} 
+
+
 ##########################################################################################################################################################################################################################################################################
 
 ##########################################################################################################################################################################################################################################################################
@@ -194,7 +210,7 @@ add_de1_text "water_1" 1390 805 -text [translate "START"] -font Helv_20_bold -fi
 add_de1_text "water" 1390 805 -text [translate "STOP"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "water_3" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_button "water_1" "say {[translate {hot water}]} $::settings(sound_button_in); set_next_page water water; start_water" 1030 210 2560 1400
-add_de1_button "water" "say [translate {stop}] $::settings(sound_button_in); set_next_page off water_3 ; start_idle" 0 181 2560 1600
+add_de1_button "water" "say [translate {stop}] $::settings(sound_button_in); set_next_page off water_3 ; start_idle" 0 189 2560 1600
 add_de1_button "water_3" "page_show water_1" 0 189 2560 1422
 
 #add_de1_text "water_1" 70 250 -text [translate "1) Choose: how much water and how hot?"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 900
@@ -230,6 +246,11 @@ add_de1_text "water" 1100 1300 -justify right -anchor "nw" -text [translate "Vol
 add_de1_variable "water" 1720 1300 -justify left -anchor "ne" -text "" -font Helv_8 -fill "#42465c" -width 520 -textvariable {[watervolume_text]} 
 
 
+add_de1_text "water_3" 1110 1270 -justify right -anchor "nw" -text [translate "Elapsed:"] -font Helv_8 -fill "#7f879a" -width 520
+add_de1_variable "water_3" 1670 1270 -justify left -anchor "ne" -font Helv_8 -text "" -fill "#42465c" -width 520 -textvariable {[timer][translate "s"]} 
+
+
+
 ##########################################################################################################################################################################################################################################################################
 
 
@@ -242,7 +263,7 @@ add_de1_text "steam" 1390 805 -text [translate "STOP"] -font Helv_20_bold -fill 
 add_de1_text "steam_2" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "steam_3" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#7f879a" -anchor "center" 
 add_de1_button "steam_1" "say {[translate {steam}]} $::settings(sound_button_in); start_steam" 1030 210 2560 1400
-add_de1_button "steam" "say [translate {stop}] $::settings(sound_button_in); set_next_page off steam_3; start_idle" 0 181 2560 1600
+add_de1_button "steam" "say [translate {stop}] $::settings(sound_button_in); set_next_page off steam_3; start_idle" 0 189 2560 1600
 add_de1_button "steam_3" "say {[translate {steam}]} $::settings(sound_button_in); page_show steam_1" 0 189 2560 1422
 
 add_de1_text "steam_1" 70 250 -text [translate "1) Choose: steam temperature and auto-off time?"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 900

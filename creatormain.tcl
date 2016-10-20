@@ -51,7 +51,7 @@ proc setup_images_for_other_pages {} {
 		if {[file exists $pngfilename] != 1} {
 			puts "WARNING, skin file not found: $pngfilename"
 		} else {
-			puts "info on $pngfilename [file size $pngfilename]"
+			#puts "info on $pngfilename [file size $pngfilename]"
 		}
 		image create photo $name -file $pngfilename
 		.can create image {0 0} -anchor nw -image $name  -tag $name -state hidden
