@@ -62,7 +62,8 @@ add_de1_text "off espresso_1" 735 330 -text [translate "STOP PREINFUSION WHEN...
 add_de1_text "espresso" 2200 417 -text [translate "STOP"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "espresso_3" 2200 417 -text [translate "DONE"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "off espresso_1" 2205 530 -text [translate "START"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
-add_de1_text "off espresso_1" 232 757 -text [translate "2 ml/s"] -font Helv_9_bold -fill "#2d3046" -anchor "center" 
+add_de1_variable "off espresso_1" 232 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_flow_rate)] [translate "ml/s"]}
+
 add_de1_text "off espresso_1" 490 490 -text [translate "94ºC"] -font Helv_9_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "off espresso_1" 232 703  -text [translate "FLOW RATE"] -font Helv_7 -fill "#7f879a" -anchor "center" 
 add_de1_text "off espresso_1" 490 432 -text [translate "TEMP"] -font Helv_7 -fill "#7f879a" -anchor "center" 
@@ -107,6 +108,14 @@ add_de1_text "off espresso_1" 1710 1214 -text [espresso_frame_description 6] -fo
 
 # make and stop espresso button
 add_de1_button "off espresso_1" "say [translate {esspresso}] $::settings(sound_button_in);set_next_page off espresso_3; start_espresso" 1900 220 2560 850
+
+add_de1_button "off espresso_1" {say [translate {flow rate}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_flow_rate) 6 0 %x %y %x0 %y0 %x1 %y1} 0 320 400 800 "mousemove"
+#add_de1_button "off espresso_1" {say [translate {flow rate}] $::settings(sound_button_in);puts "tap: -width %x -length %y %X %Y %h %w"} 0 320 400 800
+
+# example of creating a widget on the page, to change a variable
+#add_de1_widget "off espresso_1" scale 100 300 -from 6.0 -to 0.1 -background #f1f1f1 -borderwidth 1 -bigincrement 0.5 -resolution 0.1 -length 400 -width 50 
+
+
 add_de1_button "espresso" "say [translate {stop}] $::settings(sound_button_in);set_next_page off espresso_3; start_idle" 1900 201 2560 1400
 add_de1_button "espresso" "say [translate {stop}] $::settings(sound_button_in);set_next_page off espresso_3; start_idle" 0 189 2560 200
 add_de1_button "espresso" {say [translate {next step}] $::settings(sound_button_in); next_espresso_step } 0 1405 2560 1600
