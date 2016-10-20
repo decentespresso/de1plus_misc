@@ -63,7 +63,7 @@ foreach {dir xdivisor ydivisor} $dirs {
     
     set newskin [regsubex {add_de1_widget (".*?") (.*?) ([0-9]+) ([0-9]+) } $newskin "add_de1_widget \\1 \\2 \[expr \{\\3/$xdivisor\}\] \[expr \{\\4/$ydivisor\}\] "]
     set newskin [regsubex {add_de1_text (".*?") ([0-9]+) ([0-9]+) } $newskin "add_de1_text \\1 \[expr \{\\2/$xdivisor\}\] \[expr \{\\3/$ydivisor\}\] "]
-    set newskin [regsubex {add_de1_button (".*?") (.*?) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9])+ (".*?")\n} $newskin "add_de1_button \\1 \\2 \[expr \{\\3/$xdivisor\}\] \[expr \{\\4/$ydivisor\}\] \[expr \{\\5/$xdivisor\}\] \[expr \{\\6/$ydivisor\}\] \\7\n"]
+    set newskin [regsubex {add_de1_button (".*?") (.*?) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ?(".*?")?\n} $newskin "add_de1_button \\1 \\2 \[expr \{\\3/$xdivisor\}\] \[expr \{\\4/$ydivisor\}\] \[expr \{\\5/$xdivisor\}\] \[expr \{\\6/$ydivisor\}\] \\7\n"]
     set newskin [regsubex {add_de1_variable (".*?") ([0-9]+) ([0-9]+) } $newskin "add_de1_variable \\1 \[expr \{\\2/$xdivisor\}\] \[expr \{\\3/$ydivisor\}\] "]
     
     # this the maximum text width for labels

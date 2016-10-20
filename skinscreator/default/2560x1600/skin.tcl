@@ -25,10 +25,10 @@ add_de1_text "water water_1 water_3" 1665 100 -text [translate "STEAM"] -font He
 add_de1_text "water water_1 water_3" 2290 100 -text [translate "HOT WATER"] -font Helv_10_bold -fill "#2d3046" -anchor "center" 
 
 # buttons for moving between tabs, available at all times that the espresso machine is not doing something hot
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {pre-heat}] $::settings(sound_button_out); page_show preheat_1" 0 0 641 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {espresso}] $::settings(sound_button_out); page_show espresso_1" 642 0 1277 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {steam}] $::settings(sound_button_out); page_show steam_1" 1278 0 1904 188
-add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {water}] $::settings(sound_button_out); page_show water_1" 1905 0 2560 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {pre-heat}] $::settings(sound_button_out); set_next_page off preheat_1; page_show preheat_1" 0 0 641 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {espresso}] $::settings(sound_button_out); set_next_page off espresso_1; page_show espresso_1" 642 0 1277 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {steam}] $::settings(sound_button_out); set_next_page off steam_1; page_show steam_1" 1278 0 1904 188
+add_de1_button "off espresso_1 espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" "say [translate {water}] $::settings(sound_button_out); set_next_page off water_1; page_show water_1" 1905 0 2560 188
 
 # when the espresso machine is doing something, the top tabs have to first stop that function, then the tab can change
 add_de1_button "preheat_2 steam water espresso" "say [translate {pre-heat}] $::settings(sound_button_out);set_next_page off preheat_1; start_idle" 0 0 641 188
@@ -51,7 +51,7 @@ add_de1_button "saver" "say [translate {awake}] $::settings(sound_button_out); s
 add_de1_text "sleep" 2500 1450 -justify right -anchor "ne" -text [translate "Going to sleep"] -font Helv_20_bold -fill "#DDDDDD" 
 
 # temporary exit button to quit app
-add_de1_button "off" "exit" 351 1424 800 1600
+add_de1_button "off espresso_1 steam_1 water_1 preheat_1" "exit" 351 1424 800 1600
 
 # text on the first espresso page
 add_de1_text "off espresso_1" 65 240 -text [translate "First: preinfuse the coffee puck with hot water"] -font Helv_10 -fill "#5a5d75" -justify "left" -anchor "nw"
