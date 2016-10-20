@@ -36,7 +36,7 @@ proc setup_images_for_other_pages {} {
 		"water_1" "[skin_directory]/water_1.png" \
 		"water_3" "[skin_directory]/water_3.png" \
 		"preheat_1" "[skin_directory]/preheat_1.png" \
-		"preheat" "[skin_directory]/preheat_2.png" \
+		"preheat_2" "[skin_directory]/preheat_2.png" \
 		"preheat_3" "[skin_directory]/preheat_3.png" \
 		"preheat_4" "[skin_directory]/preheat_4.png" \
 		"settings" "[skin_directory]/settings_on.png" \
@@ -48,6 +48,11 @@ proc setup_images_for_other_pages {} {
 
 	# load each of the PNGs that get displayed for each espresso machine achivity
 	foreach {name pngfilename} [array get page_images] {
+		if {[file exists $pngfilename] != 1} {
+			puts "WARNING, skin file not found: $pngfilename"
+		} else {
+			puts "info on $pngfilename [file size $pngfilename]"
+		}
 		image create photo $name -file $pngfilename
 		.can create image {0 0} -anchor nw -image $name  -tag $name -state hidden
 	}
@@ -77,5 +82,4 @@ proc de1_creator_ui_startup {} {
 	}
 	vwait forever
 }
-
 
