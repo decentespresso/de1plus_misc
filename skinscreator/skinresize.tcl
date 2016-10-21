@@ -4,7 +4,7 @@
 
 cd /d/admin/code/de1beta/skinscreator/default/2560x1600
 
-set fast 1
+set fast 0
 
 proc fast_write_open {fn parms} {
     set f [open $fn $parms]
