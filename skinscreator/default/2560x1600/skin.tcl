@@ -69,13 +69,14 @@ add_de1_variable "off espresso_1" 2230 480 -justify right -anchor "ne" -text "" 
 add_de1_variable "off espresso_1" 2235 480 -justify left -anchor "nw" -text "" -font Helv_7 -fill "#42465c" -width 520 -textvariable {[group_head_heater_temperature_text]} 
 
 
-add_de1_variable "off espresso_1" 232 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_flow_rate)] [translate "ml/s"]}
-add_de1_variable "off espresso_1" 490 490 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_temperature)] [translate "ºC"]}
-add_de1_variable "off espresso_1" 835 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_stop_flow_rate)] [translate "ml/s"]}
-add_de1_variable "off espresso_1" 1132 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_stop_pressure)] [translate "bar"]}
+add_de1_variable "off espresso_1" 232 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_flow_rate)] [translate "ml/s"]}
+add_de1_variable "off espresso_1" 490 490 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_temperature)] [translate "ºC"]}
+add_de1_variable "off espresso_1" 835 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[setting_espresso_stop_flow_text]}
+add_de1_variable "off espresso_1" 1132 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[setting_espresso_stop_pressure_text]}
+#add_de1_variable "off espresso_1" 1132 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_stop_pressure)] [translate "bar"]}
 
-add_de1_variable "off espresso_1" 1423 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_stop_volumetric)] [translate "ml"]}
-add_de1_variable "off espresso_1" 1717 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_stop_timeout)][translate "s"]}
+add_de1_variable "off espresso_1" 1423 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_stop_volumetric)] [translate "ml"]}
+add_de1_variable "off espresso_1" 1717 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_stop_timeout)][translate "s"]}
 
 
 #add_de1_text "off espresso_1" 490 490 -text [translate "94ºC"] -font Helv_9_bold -fill "#2d3046" -anchor "center" 
@@ -124,12 +125,12 @@ add_de1_text "off espresso_1" 1710 1214 -text [espresso_frame_description 6] -fo
 add_de1_button "off espresso_1" {say [translate {esspresso}] $::settings(sound_button_in);set_next_page off espresso_3; start_espresso} 1900 200 2560 690
 add_de1_button "off espresso_1" {say [translate {rinse}] $::settings(sound_button_in);set_next_page off espresso_3; start_espresso} 1900 691 2560 855
 add_de1_button "espresso_3" {say [translate {rinse}] $::settings(sound_button_in);set_next_page off espresso_3; start_espresso} 1900 621 2560 855
-add_de1_button "off espresso_1" {say [translate {flow rate}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_flow_rate) 0.1 6 %x %y %x0 %y0 %x1 %y1} 0 320 400 830 "mousemove"
-add_de1_button "off espresso_1" {say [translate {temperature}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_temperature) 80 96 %x %y %x0 %y0 %x1 %y1} 401 320 700 830 "mousemove"
-add_de1_button "off espresso_1" {say [translate {temperature}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_stop_flow_rate) 0.1 6 %x %y %x0 %y0 %x1 %y1} 701 320 980 830 "mousemove"
-add_de1_button "off espresso_1" {say [translate {temperature}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_stop_pressure) 0 6 %x %y %x0 %y0 %x1 %y1} 981 320 1280 830 "mousemove"
-add_de1_button "off espresso_1" {say [translate {water reaches}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_stop_volumetric) 0.1 50 %x %y %x0 %y0 %x1 %y1} 1281 320 1570 830 "mousemove"
-add_de1_button "off espresso_1" {say [translate {time-out}] $::settings(sound_button_in);vertical_slider ::de1(preinfusion_stop_timeout) 0 120 %x %y %x0 %y0 %x1 %y1} 1571 320 1870 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {flow rate}] $::settings(sound_button_in);vertical_slider ::settings(preinfusion_flow_rate) 0.1 6 %x %y %x0 %y0 %x1 %y1} 0 320 400 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {temperature}] $::settings(sound_button_in);vertical_slider ::settings(preinfusion_temperature) 80 96 %x %y %x0 %y0 %x1 %y1} 401 320 700 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {stop at flow rate}] $::settings(sound_button_in); set ::settings(preinfusion_stop_pressure) {0}; vertical_slider ::settings(preinfusion_stop_flow_rate) 0.1 6 %x %y %x0 %y0 %x1 %y1} 701 320 980 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {stop at pressure}] $::settings(sound_button_in); set ::settings(preinfusion_stop_flow_rate) {0}; vertical_slider ::settings(preinfusion_stop_pressure) 0 6 %x %y %x0 %y0 %x1 %y1} 981 320 1280 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {stop when water reaches}] $::settings(sound_button_in);vertical_slider ::settings(preinfusion_stop_volumetric) 0.1 50 %x %y %x0 %y0 %x1 %y1} 1281 320 1570 830 "mousemove"
+add_de1_button "off espresso_1" {say [translate {preinfusion time-out}] $::settings(sound_button_in);vertical_slider ::settings(preinfusion_stop_timeout) 0 120 %x %y %x0 %y0 %x1 %y1} 1571 320 1870 830 "mousemove"
 
 #add_de1_button "off espresso_1" {say [translate {flow rate}] $::settings(sound_button_in);puts "tap: -width %x -length %y %X %Y %h %w"} 0 320 400 800
 
@@ -212,22 +213,22 @@ add_de1_button "preheat_1" {say {[translate {pre-heat cup}]} $::settings(sound_b
 add_de1_button "preheat_2" {say [translate {stop}] $::settings(sound_button_in); set_next_page off preheat_3; start_idle} 0 189 2560 1600
 add_de1_button "preheat_3" "set_next_page off preheat_1; page_show preheat_1" 0 189 2560 1422
 
-add_de1_button "preheat_1" {say [translate {water volume}] $::settings(sound_button_in);vertical_slider ::de1(preheat_volume) 1 400 %x %y %x0 %y0 %x1 %y1} 0 210 550 1400 "mousemove"
-add_de1_button "preheat_1" {say [translate {water temperature}] $::settings(sound_button_in);vertical_slider ::de1(preheat_temperature) 20 96 %x %y %x0 %y0 %x1 %y1} 551 210 1029 1400 "mousemove"
+add_de1_button "preheat_1" {say [translate {water volume}] $::settings(sound_button_in);vertical_slider ::settings(preheat_volume) 1 400 %x %y %x0 %y0 %x1 %y1} 0 210 550 1400 "mousemove"
+add_de1_button "preheat_1" {say [translate {water temperature}] $::settings(sound_button_in);vertical_slider ::settings(preheat_temperature) 20 96 %x %y %x0 %y0 %x1 %y1} 551 210 1029 1400 "mousemove"
 
 add_de1_text "preheat_1" 70 250 -text [translate "1) How much water and how hot"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 900
 add_de1_text "preheat_1 preheat_2" 1070 250 -text [translate "2) Water will pour into your cup"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 650
 add_de1_text "preheat_1" 1840 250 -text [translate "3) Hot water warms your cup"] -font Helv_9 -fill "#b1b9cd" -anchor "nw" -width 680
 add_de1_text "preheat_3" 1840 250 -text [translate "3) Hot water warms your cup"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 680
 
-add_de1_variable "preheat_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::de1(preheat_volume)] [translate "ml"]}
+add_de1_variable "preheat_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::settings(preheat_volume)] [translate "ml"]}
 add_de1_text "preheat_1" 300 1300  -text [translate "VOLUME"] -font Helv_7 -fill "#7f879a" -anchor "center" 
-add_de1_variable "preheat_1" 755 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::de1(preheat_temperature)][translate "ºC"]}
+add_de1_variable "preheat_1" 755 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::settings(preheat_temperature)][translate "ºC"]}
 add_de1_text "preheat_1" 755 1300 -text [translate "TEMP"] -font Helv_7 -fill "#7f879a" -anchor "center" 
 
-add_de1_variable "preheat_2 preheat_3" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::de1(preheat_volume)] [translate "ml"]}
+add_de1_variable "preheat_2 preheat_3" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::settings(preheat_volume)] [translate "ml"]}
 add_de1_text "preheat_2 preheat_3" 300 1300  -text [translate "VOLUME"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
-add_de1_variable "preheat_2 preheat_3" 755 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::de1(preheat_temperature)][translate "ºC"]}
+add_de1_variable "preheat_2 preheat_3" 755 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::settings(preheat_temperature)][translate "ºC"]}
 add_de1_text "preheat_2 preheat_3" 755 1300 -text [translate "TEMP"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
 
 
@@ -250,21 +251,21 @@ add_de1_button "water_3" {set_next_page off water_1; page_show water_1} 0 189 25
 add_de1_button "water_1" {say {[translate {rinse}]} $::settings(sound_button_in); set_next_page water water; start_water} 1030 1101 1760 1400
 
 
-add_de1_button "water_1" {say [translate {water volume}] $::settings(sound_button_in);vertical_slider ::de1(water_volume) 1 400 %x %y %x0 %y0 %x1 %y1} 0 210 550 1400 "mousemove"
-add_de1_button "water_1" {say [translate {water temperature}] $::settings(sound_button_in);vertical_slider ::de1(water_temperature) 20 96 %x %y %x0 %y0 %x1 %y1} 551 210 1029 1400 "mousemove"
+add_de1_button "water_1" {say [translate {water volume}] $::settings(sound_button_in);vertical_slider ::settings(water_volume) 1 400 %x %y %x0 %y0 %x1 %y1} 0 210 550 1400 "mousemove"
+add_de1_button "water_1" {say [translate {water temperature}] $::settings(sound_button_in);vertical_slider ::settings(water_temperature) 20 96 %x %y %x0 %y0 %x1 %y1} 551 210 1029 1400 "mousemove"
 
 #add_de1_text "water_1" 70 250 -text [translate "1) Choose: how much water and how hot"] -font Helv_10 -fill "#5a5d75" -anchor "nw" -width 900
 add_de1_text "water_1" 1070 250 -text [translate "2) Water will pour into your cup"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 650
 add_de1_text "water" 70 250 -text [translate "1) How much water and how hot"] -font Helv_9 -fill "#b1b9cd" -anchor "nw" -width 900
 
-add_de1_variable "water_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center"  -textvariable {[round_to_integer $::de1(water_volume)] [translate "ml"]}
+add_de1_variable "water_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center"  -textvariable {[round_to_integer $::settings(water_volume)] [translate "ml"]}
 add_de1_text "water_1" 300 1300  -text [translate "VOLUME"] -font Helv_7 -fill "#7f879a" -anchor "center" 
-add_de1_variable "water_1" 755 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::de1(water_temperature)][translate "ºC"]}
+add_de1_variable "water_1" 755 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::settings(water_temperature)][translate "ºC"]}
 add_de1_text "water_1" 755 1300 -text [translate "TEMP"] -font Helv_7 -fill "#7f879a" -anchor "center" 
 
-add_de1_variable "water" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center"  -textvariable {[round_to_integer $::de1(water_volume)] [translate "ml"]}
+add_de1_variable "water" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center"  -textvariable {[round_to_integer $::settings(water_volume)] [translate "ml"]}
 add_de1_text "water" 300 1300  -text [translate "VOLUME"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
-add_de1_variable "water" 755 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::de1(water_temperature)][translate "ºC"]}
+add_de1_variable "water" 755 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::settings(water_temperature)][translate "ºC"]}
 add_de1_text "water" 755 1300 -text [translate "TEMP"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
 
 # data card
@@ -308,13 +309,11 @@ add_de1_button "steam_1" {say {[translate {rinse}]} $::settings(sound_button_in)
 add_de1_button "steam" {say [translate {stop}] $::settings(sound_button_in); set_next_page off steam_3; start_idle} 0 189 2560 1600
 add_de1_button "steam_3" {say {[translate {steam}]} $::settings(sound_button_in); set_next_page off steam_1; page_show steam_1} 0 189 2560 1422
 
-add_de1_variable "steam_1" 1410 855 -justify right -anchor "ne" -text "" -font Helv_7 -fill "#7f879a" -width 520 -textvariable {[steam_heater_action_text]} 
-add_de1_variable "steam_1" 1415 855 -justify left -anchor "nw" -font Helv_7 -text "" -fill "#42465c" -width 520 -textvariable {[setting_steam_temperature_text]} 
+add_de1_variable "steam_1" 1405 855 -justify right -anchor "ne" -text "" -font Helv_7 -fill "#7f879a" -width 520 -textvariable {[steam_heater_action_text]} 
+add_de1_variable "steam_1" 1410 855 -justify left -anchor "nw" -font Helv_7 -text "" -fill "#42465c" -width 520 -textvariable {[setting_steam_temperature_text]} 
 
-
-
-add_de1_button "steam_1" {say [translate {steam temperature}] $::settings(sound_button_in);vertical_slider ::de1(steam_temperature) 140 170 %x %y %x0 %y0 %x1 %y1} 0 210 450 1400 "mousemove"
-add_de1_button "steam_1" {say [translate {steam time-out}] $::settings(sound_button_in);vertical_slider ::de1(steam_timeout) 1 500 %x %y %x0 %y0 %x1 %y1} 451 210 1029 1400 "mousemove"
+add_de1_button "steam_1" {say [translate {steam temperature}] $::settings(sound_button_in);vertical_slider ::settings(steam_temperature) 140 170 %x %y %x0 %y0 %x1 %y1} 0 210 450 1400 "mousemove"
+add_de1_button "steam_1" {say [translate {steam time-out}] $::settings(sound_button_in);vertical_slider ::settings(steam_timeout) 1 500 %x %y %x0 %y0 %x1 %y1} 451 210 1029 1400 "mousemove"
 
 add_de1_text "steam_1" 70 250 -text [translate "1) Steam temperature and auto-off time"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 900
 add_de1_text "steam_1" 1070 250 -text [translate "2) Steam will start"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 650
@@ -323,17 +322,17 @@ add_de1_text "steam_3" 1840 250 -text [translate "3) Pour amazing latte art"] -f
 add_de1_text "steam" 70 250 -text [translate "1) Steam temperature and auto-off time"] -font Helv_9 -fill "#b1b9cd" -anchor "nw" -width 900
 add_de1_text "steam" 1840 250 -text [translate "3) Make amazing latte art"] -font Helv_9 -fill "#b1b9cd" -anchor "nw" -width 680
 
-add_de1_variable "steam_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::de1(steam_temperature)][translate "ºC"]}
+add_de1_variable "steam_1" 300 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_integer $::settings(steam_temperature)][translate "ºC"]}
 add_de1_text "steam_1" 300 1300  -text [translate "TEMP"] -font Helv_7 -fill "#7f879a" -anchor "center" 
-add_de1_variable "steam_1" 720 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center"  -textvariable {[round_to_integer $::de1(steam_timeout)][translate "s"]}
+add_de1_variable "steam_1" 720 1250 -text "" -font Helv_10_bold -fill "#2d3046" -anchor "center"  -textvariable {[round_to_integer $::settings(steam_timeout)][translate "s"]}
 add_de1_text "steam_1" 720 1300 -text [translate "AUTO-OFF"] -font Helv_7 -fill "#7f879a" -anchor "center" 
 
 
-#add_de1_variable "off espresso_1" 1717 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::de1(preinfusion_stop_timeout)][translate "s"]}
+#add_de1_variable "off espresso_1" 1717 757 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "center" -textvariable {[round_to_one_digits $::settings(preinfusion_stop_timeout)][translate "s"]}
 
-add_de1_variable "steam" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::de1(steam_temperature)][translate "ºC"]}
+add_de1_variable "steam" 300 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center" -textvariable {[round_to_integer $::settings(steam_temperature)][translate "ºC"]}
 add_de1_text "steam" 300 1300  -text [translate "TEMP"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
-add_de1_variable "steam" 720 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center"  -textvariable {[round_to_integer $::de1(steam_timeout)][translate "s"]}
+add_de1_variable "steam" 720 1250 -text "" -font Helv_10_bold -fill "#7f879a" -anchor "center"  -textvariable {[round_to_integer $::settings(steam_timeout)][translate "s"]}
 add_de1_text "steam" 720 1300 -text [translate "AUTO-OFF"] -font Helv_7 -fill "#b1b9cd" -anchor "center" 
 
 # variables to display during steam
