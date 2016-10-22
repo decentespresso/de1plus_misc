@@ -11,6 +11,7 @@ package require de1_machine
 ##############################
 
 
+#		"espresso_1" "[skin_directory]/espresso_1.png" \
 
 
 proc setup_images_for_other_pages {} {
@@ -27,7 +28,6 @@ proc setup_images_for_other_pages {} {
 	array set page_images [list \
 		"off" "[skin_directory]/espresso_1.png" \
 		"espresso" "[skin_directory]/espresso_2.png" \
-		"espresso_1" "[skin_directory]/espresso_1.png" \
 		"espresso_3" "[skin_directory]/espresso_3.png" \
 		"steam" "[skin_directory]/steam_2.png" \
 		"steam_1" "[skin_directory]/steam_1.png" \

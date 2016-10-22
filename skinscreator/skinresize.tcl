@@ -4,7 +4,7 @@
 
 cd /d/admin/code/de1beta/skinscreator/default/2560x1600
 
-set fast 0
+set fast 1
 
 proc fast_write_open {fn parms} {
     set f [open $fn $parms]
@@ -44,6 +44,9 @@ set dirs [list \
     "1280x720"  2 2.22222 \
     "2560x1440" 1 1.11111 \
 ]
+#set dirs [list \
+#    "1280x800" 2 2 \
+#]
 
 # convert all the skin PNG files
 foreach {dir xdivisor ydivisor} $dirs {
@@ -53,7 +56,14 @@ foreach {dir xdivisor ydivisor} $dirs {
         foreach skinfile $skinfiles {
             puts -nonewline "."
             flush stdout
-            exec convert $skinfile -resize $dir!  ../$dir/$skinfile &
+            #puts "\n $skinfile [file extension $skinfile]"
+            if {[file extension $skinfile] == ".png"} {
+                # imagemagick sometimes creates a PNG that Tcl can't read, so we use OSX command line to read and write the PNG back, which fixes whatever problems it had
+                exec convert $skinfile  -resize $dir!  -format png24 ../$dir/$skinfile 
+                exec sips -s format png ../$dir/$skinfile  --out ../$dir/$skinfile 
+            } else {
+                exec convert $skinfile -resize $dir!  ../$dir/$skinfile 
+            }
         }
     }
 
@@ -68,8 +78,10 @@ foreach {dir xdivisor ydivisor} $dirs {
     
     # this the maximum text width for labels
     #puts "xdivisor: $xdivisor"
+    set newskin [regsubex {\-linewidth ([0-9]+)} $newskin "-linewidth \[expr \{\\1/$xdivisor\}\] "]
     set newskin [regsubex {\-width ([0-9]+)} $newskin "-width \[expr \{\\1/$xdivisor\}\] "]
     set newskin [regsubex {\-length ([0-9]+)} $newskin "-length \[expr \{\\1/$ydivisor\}\] "]
+    set newskin [regsubex {\-height ([0-9]+)} $newskin "-height \[expr \{\\1/$ydivisor\}\] "]
     write_file "../$dir/skin.tcl" $newskin 
     puts "";
 
