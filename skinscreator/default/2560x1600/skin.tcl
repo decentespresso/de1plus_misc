@@ -1,4 +1,4 @@
-set ::skindebug 0
+set ::skindebug 1
 
 # labels for PREHEAT tab on
 add_de1_text "preheat_1 preheat_2 preheat_3 preheat_4" 405 100 -text [translate "PRE-HEAT CUP"] -font Helv_10_bold -fill "#2d3046" -anchor "center" 
@@ -26,7 +26,7 @@ add_de1_text "water water_1 water_3" 2290 100 -text [translate "HOT WATER"] -fon
 
 # buttons for moving between tabs, available at all times that the espresso machine is not doing something hot
 add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {pre-heat}] $::settings(sound_button_out); set_next_page off preheat_1; page_show preheat_1} 0 0 641 188
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {espresso}] $::settings(sound_button_out); set_next_page off off; page_show off} 642 0 1277 188
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {espresso}] $::settings(sound_button_out); set_next_page off off; clear_espresso_chart; page_show off} 642 0 1277 188
 add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {steam}] $::settings(sound_button_out); set_next_page off steam_1; page_show steam_1} 1278 0 1904 188
 add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {water}] $::settings(sound_button_out); set_next_page off water_1; page_show water_1} 1905 0 2560 188
 
@@ -36,18 +36,17 @@ add_de1_button "preheat_2 steam water espresso" {say [translate {espresso}] $::s
 add_de1_button "preheat_2 steam water espresso" {say [translate {steam}] $::settings(sound_button_out);set_next_page off steam_1; start_idle} 1278 0 1904 188
 add_de1_button "preheat_2 steam water espresso" {say [translate {water}] $::settings(sound_button_out);set_next_page off water_1; start_idle} 1905 0 2560 188
 
+# espresso charts
+add_de1_widget "espresso espresso_3" graph 30 265 {$widget element create line_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -label "" -linewidth 10 -color #40dc94  -smooth quadratic -pixels 0; $widget element create line_espresso_state_change_1 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth 6 -color #888888  -pixels 0 ; $widget axis configure x -color #5a5d75 -tickfont Helv_6 ; $widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure);} -plotbackground #FFFFFF -width 1649 -height 328 -borderwidth 0 -background #FFFFFF 
+add_de1_widget "espresso espresso_3" graph 30 667 {$widget element create line_espresso_flow  -xdata espresso_elapsed -ydata espresso_flow -label "" -linewidth 10 -color #4e85f4 -smooth quadratic -pixels 0; $widget element create line_espresso_state_change_2 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth 6 -color #888888  -pixels 0; $widget axis configure x -color #5a5d75 -tickfont Helv_6 ; $widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate); } -width 1649 -height 328  -plotbackground #FFFFFF -borderwidth 0 -background #FFFFFF 
+add_de1_widget "espresso espresso_3" graph 30 1070 {$widget element create line_espresso_temperature_basket -xdata espresso_elapsed -ydata espresso_temperature_basket -label ""  -linewidth 10 -color #e73249 -smooth quadratic -pixels 0; $widget element create line_espresso_temperature_mix -xdata espresso_elapsed -ydata espresso_temperature_mix -label "" -linewidth 6 -color #ffa5a6 -smooth quadratic -pixels 0; $widget element create line_espresso_state_change_3 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth 6 -color #888888  -pixels 0; $widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6 ; $widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); } -width 1649 -height 328  -plotbackground #FFFFFF -borderwidth 0 -background #FFFFFF
+
+
 
 # save/load/clear buttons
 add_de1_text "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" 1240 1520 -text [translate "Clear"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
 add_de1_text "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" 1760 1520 -text [translate "Load"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
 add_de1_text "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" 2275 1520 -text [translate "Save"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
-
-
-    
-
-add_de1_widget "espresso espresso_3" graph 30 265 {$name element create line_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -label "" -linewidth 10 -color #40dc94  -smooth quadratic -pixels 0; $name axis configure x -color #5a5d75 -tickfont Helv_6; $name axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure) } -plotbackground #FFFFFF -width 1649 -height 328 -borderwidth 0 -background #FFFFFF
-add_de1_widget "espresso espresso_3" graph 30 667 {$name element create line_espresso_flow -xdata espresso_elapsed -ydata espresso_flow -label "" -linewidth 10 -color #4e85f4 -smooth quadratic -pixels 0; $name axis configure x -color #5a5d75 -tickfont Helv_6; $name axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate)} -width 1649 -height 328  -plotbackground #FFFFFF -borderwidth 0 -background #FFFFFF
-add_de1_widget "espresso espresso_3" graph 30 1070 {$name element create line_espresso_temperature_basket -xdata espresso_elapsed -ydata espresso_temperature_basket -label "" -linewidth 10 -color #e73249 -smooth quadratic -pixels 0; $name element create line_espresso_temperature_mix -xdata espresso_elapsed -ydata espresso_temperature_mix -label "" -linewidth 6 -color #ffa5a6 -smooth quadratic -pixels 0; $name axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6; $name axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature) } -width 1649 -height 328  -plotbackground #FFFFFF -borderwidth 0 -background #FFFFFF
 
 # the "go to sleep" button and the whole-screen button for coming back awake
 add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4" {say [translate {sleep}] $::settings(sound_button_out); start_sleep} 0 1424 350 1600
@@ -55,7 +54,7 @@ add_de1_button "saver" {say [translate {awake}] $::settings(sound_button_out); s
 add_de1_text "sleep" 2500 1450 -justify right -anchor "ne" -text [translate "Going to sleep"] -font Helv_20_bold -fill "#DDDDDD" 
 
 # temporary exit button to quit app
-add_de1_button "off steam_1 water_1 preheat_1" "exit" 351 1424 800 1600
+add_de1_button "off espresso_3 steam_1 water_1 preheat_1 steam_3 water_3 preheat_3" "exit" 351 1424 800 1600
 
 # text on the first espresso page
 add_de1_text "off" 65 240 -text [translate "1) Preinfuse the coffee puck with hot water"] -font Helv_9 -fill "#5a5d75" -justify "left" -anchor "nw"
@@ -167,7 +166,7 @@ add_de1_text "espresso" 1720 1535 -text [espresso_frame_title 3] -font Helv_6_bo
 
 ##########################################################################################################################################################################################################################################################################
 # data card displayed during espresso making
-add_de1_variable "espresso" 1900 710 -text "" -font Helv_9_bold -fill "#2d3046" -anchor "nw" -textvariable {[string toupper [translate [de1_substate_text]]]} 
+add_de1_variable "espresso" 1900 710 -text "" -font Helv_8_bold -fill "#2d3046" -anchor "nw" -textvariable {[string toupper [translate [de1_substate_text]]]} 
 
 add_de1_text "espresso" 1900 785 -justify right -anchor "nw" -text [translate "Time"] -font Helv_8_bold -fill "#5a5d75" -width 520
 
@@ -308,17 +307,19 @@ add_de1_variable "water_3" 1670 1270 -justify left -anchor "ne" -font Helv_8 -te
 # settings for steam
 
 add_de1_text "steam_1" 1390 1270 -text [translate "Rinse"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
-add_de1_text "steam_1" 1390 805 -text [translate "START"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
+add_de1_text "steam_3" 2180 1280 -text [translate "Rinse"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
+add_de1_text "steam_1" 1390 790 -text [translate "START"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "steam" 1390 805 -text [translate "STOP"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "steam_2" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#2d3046" -anchor "center" 
 add_de1_text "steam_3" 1390 805 -text [translate "DONE"] -font Helv_20_bold -fill "#7f879a" -anchor "center" 
 add_de1_button "steam_1" {say {[translate {steam}]} $::settings(sound_button_in); start_steam} 1030 210 2560 1100
 add_de1_button "steam_1" {say {[translate {rinse}]} $::settings(sound_button_in); start_steam} 1030 1101 1760 1400
 add_de1_button "steam" {say [translate {stop}] $::settings(sound_button_in); set_next_page off steam_3; start_idle} 0 189 2560 1600
-add_de1_button "steam_3" {say {[translate {steam}]} $::settings(sound_button_in); set_next_page off steam_1; page_show steam_1} 0 189 2560 1422
+add_de1_button "steam_3" {say {[translate {steam}]} $::settings(sound_button_in); set_next_page off steam_1; page_show steam_1} 0 189 1810 1422
+add_de1_button "steam_3" {say {[translate {steam}]} $::settings(sound_button_in); start_steam} 1811 189 2560 1422
 
-add_de1_variable "steam_1" 1405 855 -justify right -anchor "ne" -text "" -font Helv_7 -fill "#7f879a" -width 520 -textvariable {[steam_heater_action_text]} 
-add_de1_variable "steam_1" 1410 855 -justify left -anchor "nw" -font Helv_7 -text "" -fill "#42465c" -width 520 -textvariable {[setting_steam_temperature_text]} 
+add_de1_variable "steam_1" 1405 840 -justify right -anchor "ne" -text "" -font Helv_7 -fill "#7f879a" -width 520 -textvariable {[steam_heater_action_text]} 
+add_de1_variable "steam_1" 1410 840 -justify left -anchor "nw" -font Helv_7 -text "" -fill "#42465c" -width 520 -textvariable {[setting_steam_temperature_text]} 
 
 add_de1_button "steam_1" {say [translate {steam temperature}] $::settings(sound_button_in);vertical_slider ::settings(steam_temperature) 140 170 %x %y %x0 %y0 %x1 %y1} 0 210 450 1400 "mousemove"
 add_de1_button "steam_1" {say [translate {steam time-out}] $::settings(sound_button_in);vertical_slider ::settings(steam_timeout) 1 500 %x %y %x0 %y0 %x1 %y1} 451 210 1029 1400 "mousemove"
