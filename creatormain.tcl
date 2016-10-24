@@ -28,6 +28,8 @@ proc setup_images_for_other_pages {} {
 	array set page_images [list \
 		"off" "[skin_directory]/espresso_1.png" \
 		"espresso" "[skin_directory]/espresso_2.png" \
+		"espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" "[skin_directory]/espresso_zoomed.png" \
+		"espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" "[skin_directory]/espresso_3_zoomed.png" \
 		"espresso_3" "[skin_directory]/espresso_3.png" \
 		"steam" "[skin_directory]/steam_2.png" \
 		"steam_1" "[skin_directory]/steam_1.png" \
@@ -57,6 +59,8 @@ proc setup_images_for_other_pages {} {
 			#puts "info on $pngfilename [file size $pngfilename]"
 		}
 		image create photo $name -file $pngfilename
+
+		puts ".can create image {0 0} -anchor nw -image $name  -tag $name -state hidden"
 		.can create image {0 0} -anchor nw -image $name  -tag $name -state hidden
 	}
 
