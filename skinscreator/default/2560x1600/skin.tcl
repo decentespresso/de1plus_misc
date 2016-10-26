@@ -25,16 +25,16 @@ add_de1_text "water water_1 water_3" 1665 100 -text [translate "STEAM"] -font He
 add_de1_text "water water_1 water_3" 2290 100 -text [translate "HOT WATER"] -font Helv_10_bold -fill "#2d3046" -anchor "center" 
 
 # buttons for moving between tabs, available at all times that the espresso machine is not doing something hot
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {pre-heat}] $::settings(sound_button_out); set_next_page off preheat_1; page_show preheat_1} 0 0 641 188
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {espresso}] $::settings(sound_button_out); set_next_page off off; clear_espresso_chart; page_show off} 642 0 1277 188
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {steam}] $::settings(sound_button_out); set_next_page off steam_1; page_show steam_1} 1278 0 1904 188
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {water}] $::settings(sound_button_out); set_next_page off water_1; page_show water_1} 1905 0 2560 188
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {pre-heat}] $::settings(sound_button_in); set_next_page off preheat_1; page_show preheat_1} 0 0 641 188
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {espresso}] $::settings(sound_button_in); set_next_page off off; clear_espresso_chart; page_show off} 642 0 1277 188
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {steam}] $::settings(sound_button_in); set_next_page off steam_1; page_show steam_1} 1278 0 1904 188
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {water}] $::settings(sound_button_in); set_next_page off water_1; page_show water_1} 1905 0 2560 188
 
 # when the espresso machine is doing something, the top tabs have to first stop that function, then the tab can change
-add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {pre-heat}] $::settings(sound_button_out);set_next_page off preheat_1; start_idle} 0 0 641 188
-add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {espresso}] $::settings(sound_button_out);set_next_page off off; start_idle} 642 0 1277 188
-add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {steam}] $::settings(sound_button_out);set_next_page off steam_1; start_idle} 1278 0 1904 188
-add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {water}] $::settings(sound_button_out);set_next_page off water_1; start_idle} 1905 0 2560 188
+add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {pre-heat}] $::settings(sound_button_in);set_next_page off preheat_1; start_idle} 0 0 641 188
+add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {espresso}] $::settings(sound_button_in);set_next_page off off; start_idle} 642 0 1277 188
+add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {steam}] $::settings(sound_button_in);set_next_page off steam_1; start_idle} 1278 0 1904 188
+add_de1_button "preheat_2 steam water espresso espresso_zoom_pressure espresso_zoom_flow espresso_zoom_temperature" {say [translate {water}] $::settings(sound_button_in);set_next_page off water_1; start_idle} 1905 0 2560 188
 
 ################################################################################################################################################################################################################################################################################################
 # espresso charts
@@ -47,7 +47,7 @@ add_de1_widget "espresso" graph 30 265 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure); 
 	bind $widget [platform_button_press] { 
-		say [translate {pressure zoom}] $::settings(sound_button_out); 
+		say [translate {pressure zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_pressure; 
 		set_next_page off espresso_3_zoom_pressure; 
 		page_show espresso_zoom_pressure} 
@@ -59,7 +59,7 @@ add_de1_widget "espresso" graph 30 667 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate); 
 	bind $widget [platform_button_press] { 
-		say [translate {flow zoom}] $::settings(sound_button_out); 
+		say [translate {flow zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_flow; 
 		set_next_page off espresso_3_zoom_flow; 
 		page_show espresso_zoom_flow} 
@@ -72,7 +72,7 @@ add_de1_widget "espresso" graph 30 1070 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {pressure zoom}] $::settings(sound_button_out); 
+		say [translate {pressure zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_temperature; 
 		set_next_page off espresso_3_zoom_temperature; 
 		page_show espresso_zoom_temperature} 
@@ -88,7 +88,7 @@ add_de1_widget "espresso_3" graph 30 265 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure); 
 	bind $widget [platform_button_press] { 
-		say [translate {pressure zoom}] $::settings(sound_button_out); 
+		say [translate {pressure zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_pressure; 
 		set_next_page off espresso_3_zoom_pressure; 
 		page_show espresso_3_zoom_pressure} 
@@ -100,7 +100,7 @@ add_de1_widget "espresso_3" graph 30 667 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate); 
 	bind $widget [platform_button_press] { 
-		say [translate {flow zoom}] $::settings(sound_button_out); 
+		say [translate {flow zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_flow; 
 		set_next_page off espresso_3_zoom_flow; 
 		page_show espresso_3_zoom_flow} 
@@ -113,7 +113,7 @@ add_de1_widget "espresso_3" graph 30 1070 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6 ; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {pressure zoom}] $::settings(sound_button_out); 
+		say [translate {pressure zoom}] $::settings(sound_button_in); 
 		set_next_page espresso espresso_zoom_temperature; 
 		set_next_page off espresso_3_zoom_temperature; 
 		page_show espresso_3_zoom_temperature} 
@@ -122,8 +122,8 @@ add_de1_widget "espresso_3" graph 30 1070 {
 
 
 
-#add_de1_button "espresso espresso_3" {say [translate {pressure flow}] $::settings(sound_button_out);set_next_page espresso espresso_zoom_flow; page_show espresso_zoom_flow} 30 667 1679 1060
-#add_de1_button "espresso espresso_3" {say [translate {pressure temperature}] $::settings(sound_button_out);set_next_page espresso espresso_zoom_temperature; page_show espresso_zoom_temperature} 30 1070 1679 921
+#add_de1_button "espresso espresso_3" {say [translate {pressure flow}] $::settings(sound_button_in);set_next_page espresso espresso_zoom_flow; page_show espresso_zoom_flow} 30 667 1679 1060
+#add_de1_button "espresso espresso_3" {say [translate {pressure temperature}] $::settings(sound_button_in);set_next_page espresso espresso_zoom_temperature; page_show espresso_zoom_temperature} 30 1070 1679 921
 
 
 #######################
@@ -134,7 +134,7 @@ add_de1_widget "espresso_zoom_pressure" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure) -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12}; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -146,7 +146,7 @@ add_de1_widget "espresso_zoom_pressure" graph 30 885 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -159,7 +159,7 @@ add_de1_widget "espresso_zoom_pressure" graph 30 1165 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -173,7 +173,7 @@ add_de1_widget "espresso_3_zoom_pressure" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure) -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12}; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -185,7 +185,7 @@ add_de1_widget "espresso_3_zoom_pressure" graph 30 885 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -198,7 +198,7 @@ add_de1_widget "espresso_3_zoom_pressure" graph 30 1165 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -217,7 +217,7 @@ add_de1_widget "espresso_zoom_flow" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure);
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -229,7 +229,7 @@ add_de1_widget "espresso_zoom_flow" graph 30 555 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -242,7 +242,7 @@ add_de1_widget "espresso_zoom_flow" graph 30 1155 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -255,7 +255,7 @@ add_de1_widget "espresso_3_zoom_flow" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure);
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -267,7 +267,7 @@ add_de1_widget "espresso_3_zoom_flow" graph 30 555 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_6 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -280,7 +280,7 @@ add_de1_widget "espresso_3_zoom_flow" graph 30 1155 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -297,7 +297,7 @@ add_de1_widget "espresso_zoom_temperature" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure);
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -309,7 +309,7 @@ add_de1_widget "espresso_zoom_temperature" graph 30 555 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -322,7 +322,7 @@ add_de1_widget "espresso_zoom_temperature" graph 30 825 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso} 
@@ -335,7 +335,7 @@ add_de1_widget "espresso_3_zoom_temperature" graph 30 270 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_pressure);
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -347,7 +347,7 @@ add_de1_widget "espresso_3_zoom_temperature" graph 30 535 {
 	$widget axis configure x -color #5a5d75 -tickfont Helv_1 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max $::de1(max_flowrate) ; 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -360,7 +360,7 @@ add_de1_widget "espresso_3_zoom_temperature" graph 30 825 {
 	$widget axis configure x -color #5a5d75 -color #5a5d75 -tickfont Helv_6 -hide 0; 
 	$widget axis configure y -color #5a5d75 -tickfont Helv_6 -min $::de1(min_temperature) -max $::de1(max_temperature); 
 	bind $widget [platform_button_press] { 
-		say [translate {zoom back}] $::settings(sound_button_out); 
+		say [translate {zoom back}] $::settings(sound_button_in); 
 		set_next_page espresso espresso; 
 		set_next_page off espresso_3; 
 		page_show espresso_3} 
@@ -387,8 +387,8 @@ add_de1_text "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water
 add_de1_text "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" 2275 1520 -text [translate "Save"] -font Helv_10_bold -fill "#eae9e9" -anchor "center" 
 
 # the "go to sleep" button and the whole-screen button for coming back awake
-add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {sleep}] $::settings(sound_button_out); start_sleep} 0 1424 350 1600
-add_de1_button "saver" {say [translate {awake}] $::settings(sound_button_out); start_idle} 0 0 2560 1600
+add_de1_button "off espresso_3 preheat_1 preheat_3 preheat_4 steam_1 steam_3 water_1 water_3 water_4 espresso_3_zoom_pressure espresso_3_zoom_flow espresso_3_zoom_temperature" {say [translate {sleep}] $::settings(sound_button_in); start_sleep} 0 1424 350 1600
+add_de1_button "saver" {say [translate {awake}] $::settings(sound_button_in); start_idle} 0 0 2560 1600
 add_de1_text "sleep" 2500 1450 -justify right -anchor "ne" -text [translate "Going to sleep"] -font Helv_20_bold -fill "#DDDDDD" 
 
 # temporary exit button to quit app
