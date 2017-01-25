@@ -919,8 +919,8 @@ add_de1_button "steam_3" {say [translate {steam}] $::settings(sound_button_in); 
 add_de1_variable "steam_1" 1405 840 -justify right -anchor "ne" -text "" -font Helv_7 -fill "#7f879a" -width 520 -textvariable {[steam_heater_action_text]} 
 add_de1_variable "steam_1" 1410 840 -justify left -anchor "nw" -font Helv_7 -text "" -fill "#42465c" -width 520 -textvariable {[setting_steam_temperature_text]} 
 
-add_de1_button "steam_1" {say [translate "" $::settings(sound_button_in);vertical_slider ::settings(steam_temperature) 140 170 %x %y %x0 %y0 %x1 %y1} 0 210 450 1400 "mousemove"
-add_de1_button "steam_1" {say [translate "" $::settings(sound_button_in);vertical_slider ::settings(steam_timeout) 1 500 %x %y %x0 %y0 %x1 %y1} 451 210 1029 1400 "mousemove"
+add_de1_button "steam_1" {say [translate ""] $::settings(sound_button_in);vertical_slider ::settings(steam_temperature) 140 170 %x %y %x0 %y0 %x1 %y1} 0 210 450 1400 "mousemove"
+add_de1_button "steam_1" {say [translate ""] $::settings(sound_button_in);vertical_slider ::settings(steam_timeout) 1 500 %x %y %x0 %y0 %x1 %y1} 451 210 1029 1400 "mousemove"
 
 add_de1_text "steam_1" 70 250 -text [translate "1) Steam temperature and auto-off time"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 900
 add_de1_text "steam_1" 1070 250 -text [translate "2) Steam will start"] -font Helv_9 -fill "#5a5d75" -anchor "nw" -width 650
