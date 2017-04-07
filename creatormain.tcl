@@ -16,7 +16,7 @@ package require de1_machine
 
 proc setup_images_for_other_pages {} {
 	#puts "setup_images_for_other_pages"
-z
+	puts "creatormain z"
 	global screen_size_width
 	global screen_size_height
 
