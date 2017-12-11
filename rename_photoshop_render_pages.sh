@@ -11,6 +11,8 @@ rm  ~/Desktop/skin0001.tif
 rm  ~/Desktop/skin0002.tif 
 rm  ~/Desktop/skin0003.tif 
 
+convert nothing_on.png -resize 640x400 icon.jpg &
+
 zopflipng -q --iterations=1 -y   nothing_on.png nothing_on.png &
 zopflipng -q --iterations=1 -y   espresso_on.png espresso_on.png &
 zopflipng -q --iterations=1 -y   steam_on.png steam_on.png &
