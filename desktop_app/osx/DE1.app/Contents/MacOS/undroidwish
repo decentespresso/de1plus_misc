@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
-MacOS/wish Resources/de1plus/de1.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name DE1
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/../../..
+DE1+.app/Contents/MacOS/wish DE1+.app/Contents/Resources/de1plus/de1.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name DE1
