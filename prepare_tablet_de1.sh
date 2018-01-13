@@ -7,13 +7,14 @@
 # user then chooses "developer options" and "developer options: on" and then "usb debugging: on"
 # 
 # keycode docs: http://thecodeartist.blogspot.hk/2011/03/simulating-keyevents-on-android-device.html https://developer.android.com/reference/android/view/KeyEvent.html http://publish.illinois.edu/weiyang-david/2013/08/08/code-numbers-for-adb-input/
+# more keycode docs: https://stackoverflow.com/questions/7789826/adb-shell-input-events
 ###############################
 
 ###############################
 # set screen timeout to 30 minutes, when not plugged in
 # note: maybe not needed any longer since we are replacing the global settings.db
-echo "Setting screen timeout"
-adb shell settings put system screen_off_timeout 1800000
+echo "Setting screen timeout to 'never'"
+adb shell settings put system screen_off_timeout 2147483646
 ###############################
 
 ###############################
@@ -36,18 +37,41 @@ echo "Setting screen brightness to max"
 adb shell 'echo 255 > /sys/devices/platform/leds-mt65xx/leds/lcd-backlight/brightness'
 ###############################
 
-###############################
-# install androwish
-echo "Installing Androwish"
-adb install android/androwish.apk
-###############################
 
 ###############################
-# copy our source files over
-#adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
-echo "Copying DE1 software"
-adb push /d/download/sync/de1 /mnt/sdcard/de1
+# disable screen swipe lock
+echo "Disabling screen swipe to lock"
+adb shell am force-stop com.android.settings 
+sleep 1
+adb shell input keyevent KEYCODE_HOME
+sleep 1
+adb shell am start -a android.intent.action.MAIN -n com.android.settings/.SecuritySettings
+sleep 1
+adb shell input swipe 100 100 100 500 100
+sleep 1
+adb shell input keyevent KEYCODE_ENTER
+sleep 1
+adb shell input keyevent KEYCODE_ENTER
+sleep 1
+adb shell input keyevent KEYCODE_ENTER
+sleep 1
+adb shell am force-stop com.android.settings 
 ###############################
+
+
+adb shell input text "borg%sbluetooth%son"
+adb shell input keyevent KEYCODE_ENTER
+adb shell input text 'borg%sbluetooth%son'
+adb shell input keyevent KEYCODE_ENTER
+
+
+###############################
+# remove supersu, which was installed by the tablet manufacturer
+# note: not currently doing this, as root access to the tablet could be useful to end users
+#echo "Installing Supersu"
+#adb uninstall eu.chainfire.supersu
+###############################
+
 
 ###############################
 # install wallpaper
@@ -56,6 +80,26 @@ adb push /d/download/sync/de1 /mnt/sdcard/de1
 echo "Setting wallpaper"
 adb push android/wallpaper_info.xml /data/system/users/0/wallpaper_info.xml
 adb push android/wallpaper /data/system/users/0/wallpaper
+###############################
+
+###############################
+# install androwish
+echo "Installing Androwish"
+adb install android/androwish.apk
+###############################
+
+
+###############################
+# copy our source files over
+#adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
+echo "Copying DE1 software"
+adb push /d/download/sync/de1 /mnt/sdcard/de1
+###############################
+
+
+###############################
+# pair with DE1 via bluetooth
+adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
 ###############################
 
 ###############################
@@ -79,18 +123,12 @@ adb push android/launcher.db.de1 /data/data/com.android.launcher3/databases/laun
 ###############################
 
 ###############################
-# disable screen swipe lock
-echo "Disabling screen swipe to lock"
-adb shell am force-stop com.android.settings 
-adb shell input keyevent KEYCODE_HOME
-sleep 1
-adb shell am start -a android.intent.action.MAIN -n com.android.settings/.SecuritySettings
-sleep 1
-adb shell input keyevent KEYCODE_ENTER
-sleep 1
-adb shell input keyevent KEYCODE_ENTER
-sleep 1
-adb shell am force-stop com.android.settings 
+# pair with DE1 via bluetooth
+# from https://android.stackexchange.com/questions/83726/how-to-adb-wait-for-device-until-the-home-screen-shows-up
+echo "Rebooting tablet"
+adb reboot
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
+adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/de1.tcl
 ###############################
 
 
@@ -99,11 +137,14 @@ adb shell am force-stop com.android.settings
 # note: need to manually drag the icons to their desired place, and also manually remove
 # note #2 : this is not needed any longer since we are wiping out the launcher.db with our own in the next line. This script is only used
 # to create the icons the first time, and then we use the sqlite table to restore them to a new tablet
-#adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/create_de1_icon.tcl
+# adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/create_de1_icon.tcl
 ###############################
 
-echo "all done... rebooting tablet"
-adb reboot
+
+# update supersu binary
+
+
+#adb reboot
 #adb shell am force-stop com.android.launcher3 
 
 exit
