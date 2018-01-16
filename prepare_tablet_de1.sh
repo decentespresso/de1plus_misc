@@ -10,25 +10,18 @@
 # more keycode docs: https://stackoverflow.com/questions/7789826/adb-shell-input-events
 ###############################
 
-###############################
-# set screen timeout to 30 minutes, when not plugged in
-# note: maybe not needed any longer since we are replacing the global settings.db
-echo "Setting screen timeout to 'never'"
-adb shell settings put system screen_off_timeout 2147483646
-###############################
+# if there are any parameters on the url then this is a DE1+ tablet pre, otherwise this is a DE1 tablet prep
+de1plus=0
+if [ "$1" != "" ] 
+then
+   de1plus=1;
+fi
+
 
 ###############################
-# and for good measure disable screen timeout while plugged in
-# note: maybe not needed any longer since we are replacing the global settings.db
-echo "Setting screen on when plugged in"
-adb shell settings put global stay_on_while_plugged_in 3
-###############################
-
-###############################
-# enable wifi
-# note: maybe not needed any longer since we are replacing the global settings.db
-echo "Setting wifi on"
-adb shell settings put global wifi_on 1
+# optional: reset the tablet to factory settings (requires user to then proceed through setup menu)
+adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
 ###############################
 
 ###############################
@@ -36,42 +29,6 @@ adb shell settings put global wifi_on 1
 echo "Setting screen brightness to max"
 adb shell 'echo 255 > /sys/devices/platform/leds-mt65xx/leds/lcd-backlight/brightness'
 ###############################
-
-
-###############################
-# disable screen swipe lock
-echo "Disabling screen swipe to lock"
-adb shell am force-stop com.android.settings 
-sleep 1
-adb shell input keyevent KEYCODE_HOME
-sleep 1
-adb shell am start -a android.intent.action.MAIN -n com.android.settings/.SecuritySettings
-sleep 1
-adb shell input swipe 100 100 100 500 100
-sleep 1
-adb shell input keyevent KEYCODE_ENTER
-sleep 1
-adb shell input keyevent KEYCODE_ENTER
-sleep 1
-adb shell input keyevent KEYCODE_ENTER
-sleep 1
-adb shell am force-stop com.android.settings 
-###############################
-
-
-adb shell input text "borg%sbluetooth%son"
-adb shell input keyevent KEYCODE_ENTER
-adb shell input text 'borg%sbluetooth%son'
-adb shell input keyevent KEYCODE_ENTER
-
-
-###############################
-# remove supersu, which was installed by the tablet manufacturer
-# note: not currently doing this, as root access to the tablet could be useful to end users
-#echo "Installing Supersu"
-#adb uninstall eu.chainfire.supersu
-###############################
-
 
 ###############################
 # install wallpaper
@@ -83,24 +40,88 @@ adb push android/wallpaper /data/system/users/0/wallpaper
 ###############################
 
 ###############################
+adb shell am force-stop com.android.settings
+sleep 1
+adb shell input keyevent KEYCODE_HOME
+###############################
+
+###############################
+# set screen timeout to 30 minutes, when not plugged in
+# note: maybe not needed any longer since we are replacing the global settings.db
+echo "Setting screen timeout to 'never'"
+adb shell settings put system screen_off_timeout 2147483646
+###############################
+
+###############################
+# disable screen swipe lock
+echo "Disabling screen swipe to lock"
+adb shell am force-stop com.android.settings 
+#sleep 1
+adb shell input keyevent KEYCODE_HOME
+#sleep 1
+adb shell am start -a android.intent.action.MAIN -n com.android.settings/.SecuritySettings
+#sleep 1
+adb shell input swipe 100 100 100 500 100
+#sleep 1
+adb shell input keyevent KEYCODE_ENTER
+#sleep 1
+adb shell input keyevent KEYCODE_ENTER
+#sleep 1
+adb shell input keyevent KEYCODE_ENTER
+#sleep 1
+adb shell am force-stop com.android.settings 
+###############################
+
+
+###############################
+# run supersu so that the user gets prompted to update the app, which causes a reboot afterwards
+# user should click OK to supersu update promps, IF a supersu update is needed.
+# supersu updates survive a factory reset, so they only need to be done once per tablet
+adb shell am start -W -a android.intent.action.MAIN -n eu.chainfire.supersu/.MainActivity
+###############################
+
+###############################
+# and for good measure disable screen timeout while plugged in
+# note: maybe not needed any longer since we are replacing the global settings.db
+echo "Setting screen on when plugged in"
+adb shell settings put global stay_on_while_plugged_in 3
+###############################
+
+###############################
+# enable bluetooth
+# echo "Enabling bluetooth"
+adb shell service call bluetooth_manager 8
+adb shell service call bluetooth_manager 6
+###############################
+
+###############################
+# enable wifi
+# note: maybe not needed any longer since we are replacing the global settings.db
+#echo "Setting wifi on"
+adb shell settings put global wifi_on 1
+###############################
+
+###############################
 # install androwish
 echo "Installing Androwish"
 adb install android/androwish.apk
 ###############################
 
-
 ###############################
 # copy our source files over
 #adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
-echo "Copying DE1 software"
-adb push /d/download/sync/de1 /mnt/sdcard/de1
-###############################
+if [ $de1plus = 0 ] 
+then
+	echo "Copying DE1 software"
+	adb push /d/download/sync/de1 /mnt/sdcard/de1
+else 
+	echo "Copying DE1+ software"
+	adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
+fi
 
 
 ###############################
-# pair with DE1 via bluetooth
-adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
-###############################
+
 
 ###############################
 # changes to global settings sqlite table
@@ -117,27 +138,63 @@ adb push android/settings.db /data/data/com.android.providers.settings/databases
 
 ###############################
 # replace the launcher3 database with our own, which moves the icons where we want them and removes all tne toolbar noise of all those google icons
-#adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1
-echo "Replacing launcher settings"
-adb push android/launcher.db.de1 /data/data/com.android.launcher3/databases/launcher.db
+# adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1
+# adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1plus
+#
+# optional: create our app icons with code
+# note: need to manually drag the icons to their desired place
+# note #2 : this is not needed since we are wiping out the launcher.db with our own in the next line. This script is only used
+# to create the icons the first time, and then we use the sqlite table to restore them to a new tablet
+# adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
+#
+
+if [ $de1plus = 0 ] 
+then
+	echo "Replacing DE1 launcher settings"
+	adb push android/launcher.db.de1 /data/data/com.android.launcher3/databases/launcher.db
+else 
+	echo "Replacing DE1+ launcher settings"
+	adb push android/launcher.db.de1plus /data/data/com.android.launcher3/databases/launcher.db
+fi
+
+###############################
+
+
+###############################
+echo "Rebooting tablet"
+adb reboot
+sleep 5
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
+###############################
+
+
+###############################
+# pair with DE1 via bluetooth
+if [ $de1plus = 0 ] 
+then
+	echo "Auto-pairing with DE1"
+	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
+else 
+	echo "Auto-pairing with DE1+"
+	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/autopair_with_de1plus.tcl
+fi
+
+# wait for a few seconds seconds for this happen
+sleep 10
 ###############################
 
 ###############################
 # pair with DE1 via bluetooth
 # from https://android.stackexchange.com/questions/83726/how-to-adb-wait-for-device-until-the-home-screen-shows-up
-echo "Rebooting tablet"
-adb reboot
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
-adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/de1.tcl
-###############################
+if [ $de1plus = 0 ] 
+then
+	echo "Launching DE1 tablet software for final testing"
+	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/de1.tcl
+else 
+	echo "Launching DE1+ tablet software for final testing"
+	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/de1plus.tcl
+fi
 
-
-###############################
-# create our app icons
-# note: need to manually drag the icons to their desired place, and also manually remove
-# note #2 : this is not needed any longer since we are wiping out the launcher.db with our own in the next line. This script is only used
-# to create the icons the first time, and then we use the sqlite table to restore them to a new tablet
-# adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/create_de1_icon.tcl
 ###############################
 
 
@@ -149,7 +206,10 @@ adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.AC
 
 exit
 
+###############################################################################################
 
+
+# everything below is historical attempts and no longer used.
 
 
 # todo: move icons to their rightful place?
@@ -258,3 +318,4 @@ adb shell input keyevent 82
 
 adb shell settings put system screen_off_timeout 60000
 adb shell settings put system screen_off_timeout 2147483646
+
