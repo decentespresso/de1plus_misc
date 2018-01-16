@@ -146,6 +146,7 @@ adb push android/settings.db /data/data/com.android.providers.settings/databases
 # note #2 : this is not needed since we are wiping out the launcher.db with our own in the next line. This script is only used
 # to create the icons the first time, and then we use the sqlite table to restore them to a new tablet
 # adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
+# adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/create_de1_icon.tcl
 #
 
 if [ $de1plus = 0 ] 
