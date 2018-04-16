@@ -49,7 +49,8 @@ adb shell input keyevent KEYCODE_HOME
 # set screen timeout to 30 minutes, when not plugged in
 # note: maybe not needed any longer since we are replacing the global settings.db
 echo "Setting screen timeout to 'never'"
-adb shell settings put system screen_off_timeout 2147483646
+#adb shell settings put system screen_off_timeout 2147483646
+adb shell settings put system screen_off_timeout 360000
 ###############################
 
 ###############################
