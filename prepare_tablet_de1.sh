@@ -20,7 +20,7 @@ fi
 
 ###############################
 # optional: reset the tablet to factory settings (requires user to then proceed through setup menu)
-adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
+#adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
 adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
 ###############################
 
