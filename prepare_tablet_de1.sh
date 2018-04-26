@@ -114,9 +114,11 @@ adb install android/androwish.apk
 if [ $de1plus = 0 ] 
 then
 	echo "Copying DE1 software"
+	adb shell rm -rf /mnt/sdcard/de1
 	adb push /d/download/sync/de1 /mnt/sdcard/de1
 else 
 	echo "Copying DE1+ software"
+	adb shell rm -rf /mnt/sdcard/de1plus
 	adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
 fi
 
@@ -172,17 +174,17 @@ adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do slee
 
 ###############################
 # pair with DE1 via bluetooth
-if [ $de1plus = 0 ] 
-then
-	echo "Auto-pairing with DE1"
-	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
-else 
-	echo "Auto-pairing with DE1+"
-	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/autopair_with_de1plus.tcl
-fi
+#if [ $de1plus = 0 ] 
+#then
+	#echo "Auto-pairing with DE1"
+	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
+#else 
+	#echo "Auto-pairing with DE1+"
+	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/autopair_with_de1plus.tcl
+#fi
 
 # wait for a few seconds seconds for this happen
-sleep 10
+#sleep 10
 ###############################
 
 ###############################
