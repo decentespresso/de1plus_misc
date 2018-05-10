@@ -134,7 +134,7 @@ fi
 # system/screen_brightness 255
 # secure/lockscreen.disabled 1
 # secure/bluetooth_name "Decent Tablet"
-#adb pull /data/data/com.android.providers.settings/databases/settings.db android/settings.db
+# adb pull /data/data/com.android.providers.settings/databases/settings.db android/settings.db
 echo "Replacing system settings"
 adb push android/settings.db /data/data/com.android.providers.settings/databases/settings.db
 ###############################
