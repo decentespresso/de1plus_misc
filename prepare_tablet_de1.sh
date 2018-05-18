@@ -17,6 +17,10 @@ then
    de1plus=1;
 fi
 
+# always doing DE1plus now
+   de1plus=1;
+
+
 
 ###############################
 # optional: reset the tablet to factory settings (requires user to then proceed through setup menu)
