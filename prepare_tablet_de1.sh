@@ -226,7 +226,7 @@ exit
 #
 
 # install wallpaper
-adb shell am start -a android.app.WallpaperManager -c android.intent.ACTION_CHANGE_LIVE_WALLPAPER  -d file:///sdcard/de1/wallpaper/spy_2560x1600.jpg  -t 'image/jpeg'  -e mimeType 'image/jpeg'
+adb shell am start -a android.app.WallpaperManager -c android.intent.ACTION_CHANGE_LIVE_WALLPAPER  -d file:///mnt/sdcard/de1/wallpaper/spy_2560x1600.jpg  -t 'image/jpeg'  -e mimeType 'image/jpeg'
 adb shell input tap 500 700
 adb shell input tap 600 600 
 adb shell input tap 600 600 
