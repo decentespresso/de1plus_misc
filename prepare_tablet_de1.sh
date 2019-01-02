@@ -99,13 +99,6 @@ adb shell service call bluetooth_manager 8
 adb shell service call bluetooth_manager 6
 ###############################
 
-###############################
-# enable wifi
-# note: maybe not needed any longer since we are replacing the global settings.db
-#echo "Setting wifi on"
-#adb shell settings put global wifi_on 1
-adb shell svc wifi disable
-###############################
 
 ###############################
 # install androwish
@@ -139,10 +132,12 @@ fi
 # system/screen_brightness 255
 # secure/lockscreen.disabled 1
 # secure/bluetooth_name "Decent Tablet"
-# adb pull /data/data/com.android.providers.settings/databases/settings.db android/settings.db
+# adb pull /data/data/com.android.providers.settings/databases/settings.db android/settings3a.db
 echo "Replacing system settings"
 adb push android/settings.db /data/data/com.android.providers.settings/databases/settings.db
 ###############################
+
+
 
 ###############################
 # replace the launcher3 database with our own, which moves the icons where we want them and removes all tne toolbar noise of all those google icons
@@ -166,6 +161,19 @@ else
 	adb push android/launcher.db.de1plus /data/data/com.android.launcher3/databases/launcher.db
 fi
 
+###############################
+
+
+
+###############################
+# enable wifi
+# note: maybe not needed any longer since we are replacing the global settings.db
+#echo "Setting wifi on"
+#adb shell settings put global wifi_on 1
+adb shell settings put global wifi_on 0
+adb shell settings put global wifi_scan_always_enabled 0
+adb shell settings put global wifi_watchdog_on 0
+adb shell svc wifi disable
 ###############################
 
 
