@@ -78,14 +78,6 @@ adb shell am force-stop com.android.settings
 ###############################
 
 ###############################
-# lower volume to zero
-# from https://developer.android.com/reference/android/view/KeyEvent
-adb shell input keyevent KEYCODE_VOLUME_MUTE
-###############################
-
-
-
-###############################
 # run supersu so that the user gets prompted to update the app, which causes a reboot afterwards
 # user should click OK to supersu update promps, IF a supersu update is needed.
 # supersu updates survive a factory reset, so they only need to be done once per tablet
@@ -191,6 +183,12 @@ adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do slee
 
 # wait for a few seconds seconds for this happen
 #sleep 10
+###############################
+
+###############################
+# lower volume to zero
+# from https://developer.android.com/reference/android/view/KeyEvent
+adb shell input keyevent KEYCODE_VOLUME_MUTE
 ###############################
 
 
