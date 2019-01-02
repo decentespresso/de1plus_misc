@@ -103,7 +103,8 @@ adb shell service call bluetooth_manager 6
 # enable wifi
 # note: maybe not needed any longer since we are replacing the global settings.db
 #echo "Setting wifi on"
-adb shell settings put global wifi_on 0
+#adb shell settings put global wifi_on 1
+adb shell svc wifi disable
 ###############################
 
 ###############################
