@@ -77,6 +77,13 @@ adb shell input keyevent KEYCODE_ENTER
 adb shell am force-stop com.android.settings 
 ###############################
 
+###############################
+# lower volume to zero
+# from https://developer.android.com/reference/android/view/KeyEvent
+adb shell input keyevent KEYCODE_VOLUME_MUTE
+###############################
+
+
 
 ###############################
 # run supersu so that the user gets prompted to update the app, which causes a reboot afterwards
@@ -163,20 +170,6 @@ fi
 
 ###############################
 
-
-
-###############################
-# enable wifi
-# note: maybe not needed any longer since we are replacing the global settings.db
-#echo "Setting wifi on"
-#adb shell settings put global wifi_on 1
-adb shell settings put global wifi_on 0
-adb shell settings put global wifi_scan_always_enabled 0
-adb shell settings put global wifi_watchdog_on 0
-adb shell svc wifi disable
-###############################
-
-
 ###############################
 echo "Rebooting tablet"
 adb reboot
@@ -199,6 +192,21 @@ adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do slee
 # wait for a few seconds seconds for this happen
 #sleep 10
 ###############################
+
+
+
+###############################
+# enable wifi
+# note: maybe not needed any longer since we are replacing the global settings.db
+#echo "Setting wifi on"
+#adb shell settings put global wifi_on 1
+adb shell settings put global wifi_on 0
+adb shell settings put global wifi_scan_always_enabled 0
+adb shell settings put global wifi_watchdog_on 0
+adb shell svc wifi disable
+###############################
+
+
 
 ###############################
 # pair with DE1 via bluetooth
@@ -278,7 +286,6 @@ adb shell input keyevent KEYCODE_ENTER
 sleep 1
 adb shell input keyevent KEYCODE_HOME
 ###################
-
 
 ###################
 # example - set ENGLISH USA as the system language. The "swipe" command is the crucial one to get precisely right
