@@ -188,7 +188,16 @@ adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do slee
 ###############################
 # lower volume to zero
 # from https://developer.android.com/reference/android/view/KeyEvent
-adb shell input keyevent KEYCODE_VOLUME_MUTE
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
+adb shell input keyevent KEYCODE_VOLUME_DOWN
 ###############################
 
 
