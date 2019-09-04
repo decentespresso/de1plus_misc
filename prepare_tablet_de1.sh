@@ -11,26 +11,26 @@
 ###############################
 
 # if there are any parameters on the url then this is a DE1+ tablet pre, otherwise this is a DE1 tablet prep
-de1plus=0
+tableterase=0
 if [ "$1" != "" ] 
 then
-   de1plus=1;
+   tableterase=1;
 fi
-
-# always doing DE1plus now
-   de1plus=1;
-
 
 
 ###############################
 # optional: reset the tablet to factory settings (requires user to then proceed through setup menu)
-#adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
-#sleep 60
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+if [ $tableterase = 1 ] 
+then
+	adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
+	sleep 60
+	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+fi
+
 ###############################
 
 ###############################
@@ -113,16 +113,16 @@ adb install android/androwish.apk
 ###############################
 # copy our source files over
 #adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
-if [ $de1plus = 0 ] 
-then
-	echo "Copying DE1 software"
-	adb shell rm -rf /mnt/sdcard/de1
-	adb push /d/download/sync/de1 /mnt/sdcard/de1
-else 
+#if [ $de1plus = 0 ] 
+#then
+#	echo "Copying DE1 software"
+#	adb shell rm -rf /mnt/sdcard/de1
+#	adb push /d/download/sync/de1 /mnt/sdcard/de1
+#else 
 	echo "Copying DE1+ software"
 	adb shell rm -rf /mnt/sdcard/de1plus
 	adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
-fi
+#fi
 
 
 ###############################
@@ -156,14 +156,14 @@ adb push android/settings.db /data/data/com.android.providers.settings/databases
 # adb shell am start -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/create_de1_icon.tcl
 #
 
-if [ $de1plus = 0 ] 
-then
-	echo "Replacing DE1 launcher settings"
-	adb push android/launcher.db.de1 /data/data/com.android.launcher3/databases/launcher.db
-else 
+#if [ $de1plus = 0 ] 
+#then
+#	echo "Replacing DE1 launcher settings"
+#	adb push android/launcher.db.de1 /data/data/com.android.launcher3/databases/launcher.db
+#else 
 	echo "Replacing DE1+ launcher settings"
 	adb push android/launcher.db.de1plus /data/data/com.android.launcher3/databases/launcher.db
-fi
+#fi
 
 ###############################
 
@@ -228,14 +228,14 @@ adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do slee
 ###############################
 # pair with DE1 via bluetooth
 # from https://android.stackexchange.com/questions/83726/how-to-adb-wait-for-device-until-the-home-screen-shows-up
-if [ $de1plus = 0 ] 
-then
-	echo "Launching DE1 tablet software for final testing"
-	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/de1.tcl
-else 
+#if [ $de1plus = 0 ] 
+#then
+#	echo "Launching DE1 tablet software for final testing"
+#	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/de1.tcl
+#else 
 	echo "Launching DE1+ tablet software for final testing"
 	adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/de1plus.tcl
-fi
+#fi
 
 ###############################
 
