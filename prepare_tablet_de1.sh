@@ -25,7 +25,12 @@ fi
 ###############################
 # optional: reset the tablet to factory settings (requires user to then proceed through setup menu)
 #adb shell am broadcast -a android.intent.action.MASTER_CLEAR; sleep 10
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
+#sleep 60
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
 ###############################
 
 ###############################
@@ -162,28 +167,6 @@ fi
 
 ###############################
 
-###############################
-echo "Rebooting tablet"
-adb reboot
-sleep 5
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 3'
-###############################
-
-
-###############################
-# pair with DE1 via bluetooth
-#if [ $de1plus = 0 ] 
-#then
-	#echo "Auto-pairing with DE1"
-	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
-#else 
-	#echo "Auto-pairing with DE1+"
-	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/autopair_with_de1plus.tcl
-#fi
-
-# wait for a few seconds seconds for this happen
-#sleep 10
-###############################
 
 ###############################
 # lower volume to zero
@@ -213,6 +196,33 @@ adb shell settings put global wifi_watchdog_on 0
 adb shell svc wifi disable
 ###############################
 
+
+
+###############################
+echo "Rebooting tablet"
+adb reboot
+sleep 15
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+###############################
+
+
+###############################
+# pair with DE1 via bluetooth
+#if [ $de1plus = 0 ] 
+#then
+	#echo "Auto-pairing with DE1"
+	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1/autopair_with_de1.tcl
+#else 
+	#echo "Auto-pairing with DE1+"
+	#adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/autopair_with_de1plus.tcl
+#fi
+
+# wait for a few seconds seconds for this happen
+#sleep 10
+###############################
 
 
 ###############################
