@@ -30,6 +30,11 @@ then
 	adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
 fi
 
+###############################
+# go to home screen
+adb shell input keyevent KEYCODE_HOME
+###############################
+
 
 
 ###############################
@@ -51,11 +56,6 @@ adb shell svc power stayon true
 #echo "Setting screen on when plugged in"
 #adb shell settings put global stay_on_while_plugged_in 3
 
-###############################
-
-###############################
-# go to home screen
-adb shell input keyevent KEYCODE_HOME
 ###############################
 
 
@@ -129,9 +129,9 @@ adb push android/wallpaper /data/system/users/0/wallpaper
 
 ###############################
 # replace the launcher3 database with our own, which moves the icons where we want them and removes all tne toolbar noise of all those google icons
-# adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1plus81
-# adb pull /data/data/com.android.launcher3/databases/app_icons.db android/app_icons.db81
-# adb pull /data/data/com.android.launcher3/databases/widgetpreviews.db android/widgetpreviews.db81
+# adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1plus81b
+# adb pull /data/data/com.android.launcher3/databases/app_icons.db android/app_icons.db81b
+# adb pull /data/data/com.android.launcher3/databases/widgetpreviews.db android/widgetpreviews.db81b
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
 sleep 2
 adb shell input tap 900 530
@@ -141,10 +141,14 @@ adb shell input tap 900 530
 adb push android/launcher.db.de1plus81 /data/data/com.android.launcher3/databases/launcher.db
 adb push android/app_icons.db81 /data/data/com.android.launcher3/databases/app_icons.db
 adb push android/widgetpreviews.db81 /data/data/com.android.launcher3/databases/widgetpreviews.db
-adb shell am restart com.android.launcher3
-sleep 2
-adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+a#db shell am force-stop com.android.launcher3
 ###############################
+
+
+db shell am restart
+sleep 5
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
+
 
 ###############################
 # pair with DE1 via bluetooth
