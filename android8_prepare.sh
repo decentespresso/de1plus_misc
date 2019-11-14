@@ -31,6 +31,14 @@ then
 fi
 
 
+
+###############################
+# make the display bright
+echo "Setting screen brightness to max"
+adb shell 'echo 255 > /sys/devices/platform/leds-mt65xx/leds/lcd-backlight/brightness'
+###############################
+
+
 ###############################
 # set screen timeout to 30 minutes, when not plugged in
 # note: maybe not needed any longer since we are replacing the global settings.db
@@ -43,13 +51,6 @@ adb shell svc power stayon true
 #echo "Setting screen on when plugged in"
 #adb shell settings put global stay_on_while_plugged_in 3
 
-###############################
-
-
-###############################
-# make the display bright
-echo "Setting screen brightness to max"
-adb shell 'echo 255 > /sys/devices/platform/leds-mt65xx/leds/lcd-backlight/brightness'
 ###############################
 
 ###############################
@@ -140,7 +141,9 @@ adb shell input tap 900 530
 adb push android/launcher.db.de1plus81 /data/data/com.android.launcher3/databases/launcher.db
 adb push android/app_icons.db81 /data/data/com.android.launcher3/databases/app_icons.db
 adb push android/widgetpreviews.db81 /data/data/com.android.launcher3/databases/widgetpreviews.db
-adb shell am force-stop com.android.launcher3
+adb shell am restart com.android.launcher3
+sleep 2
+adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 2; done; input keyevent 3'
 ###############################
 
 ###############################
