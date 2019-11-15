@@ -119,12 +119,6 @@ adb install android/androwish.apk
 ###############################
 
 ###############################
-# install androwish
-echo "Installing Chrome"
-adb install android/chrome.apk 
-###############################
-
-###############################
 # install wallpaper
 #adb pull /data/system/users/0/wallpaper
 #adb pull /data/system/users/0/wallpaper_info.xml
@@ -139,21 +133,31 @@ adb push android/wallpaper /data/system/users/0/wallpaper
 # adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1plus81b
 # adb pull /data/data/com.android.launcher3/databases/app_icons.db android/app_icons.db81b
 # adb pull /data/data/com.android.launcher3/databases/widgetpreviews.db android/widgetpreviews.db81b
+
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
-sleep 2
+sleep 3
 adb shell input tap 900 530
+adb shell am force-stop tk.tcl.wish
+sleep 1
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1_update_icon.tcl
-sleep 2
+sleep 3
 adb shell input tap 900 530
+sleep 1
+adb shell am force-stop tk.tcl.wish
+sleep 1
+
 adb push android/launcher.db.de1plus81 /data/data/com.android.launcher3/databases/launcher.db
-adb push android/app_icons.db81 /data/data/com.android.launcher3/databases/app_icons.db
-adb push android/widgetpreviews.db81 /data/data/com.android.launcher3/databases/widgetpreviews.db
-#adb shell am force-stop com.android.launcher3
+adb shell am force-stop com.android.launcher3
+#adb push android/app_icons.db81 /data/data/com.android.launcher3/databases/app_icons.db
+#adb push android/widgetpreviews.db81 /data/data/com.android.launcher3/databases/widgetpreviews.db
+
 ###############################
 
-echo "Waiting for completion"
-wait
+###############################
+# install androwish
+echo "Installing Chrome"
+adb install android/chrome.apk 
+###############################
 
-adb shell am restart com.android.launcher3
 
-#echo DONE!
+adb shell am restart 
