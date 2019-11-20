@@ -134,13 +134,17 @@ adb push android/wallpaper /data/system/users/0/wallpaper
 # adb pull /data/data/com.android.launcher3/databases/app_icons.db android/app_icons.db81b
 # adb pull /data/data/com.android.launcher3/databases/widgetpreviews.db android/widgetpreviews.db81b
 
+echo "Creating de1+ icon"
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
 sleep 3
+echo "Tapping on system dialog to accept de1+ icon"
 adb shell input tap 900 530
 adb shell am force-stop tk.tcl.wish
 sleep 1
+echo "Creating cloud update icon"
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1_update_icon.tcl
 sleep 3
+echo "Tapping on system dialog to accept cloud upload icon"
 adb shell input tap 900 530
 sleep 1
 adb shell am force-stop tk.tcl.wish
