@@ -141,6 +141,7 @@ echo "Tapping on system dialog to accept de1+ icon"
 adb shell input tap 900 530
 adb shell am force-stop tk.tcl.wish
 sleep 1
+
 echo "Creating cloud update icon"
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1_update_icon.tcl
 sleep 3
@@ -148,10 +149,11 @@ echo "Tapping on system dialog to accept cloud upload icon"
 adb shell input tap 900 530
 sleep 1
 adb shell am force-stop tk.tcl.wish
-sleep 1
 
-adb push android/launcher.db.de1plus81 /data/data/com.android.launcher3/databases/launcher.db
+adb push android/launcher.db.de1plus81b /data/data/com.android.launcher3/databases/launcher.db
 adb shell am force-stop com.android.launcher3
+
+
 #adb push android/app_icons.db81 /data/data/com.android.launcher3/databases/app_icons.db
 #adb push android/widgetpreviews.db81 /data/data/com.android.launcher3/databases/widgetpreviews.db
 
