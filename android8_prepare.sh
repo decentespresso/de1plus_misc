@@ -124,7 +124,7 @@ adb install android/androwish.apk
 #adb pull /data/system/users/0/wallpaper_info.xml
 echo "Setting wallpaper"
 adb push android/wallpaper_info.xml /data/system/users/0/wallpaper_info.xml
-adb push android/wallpaper /data/system/users/0/wallpaper
+adb push wallpaper/spy_1280x800.jpg /data/system/users/0/wallpaper
 ###############################
 
 
