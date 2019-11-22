@@ -150,7 +150,7 @@ adb shell input tap 900 530
 sleep 1
 adb shell am force-stop tk.tcl.wish
 
-adb push android/launcher.db.de1plus81b /data/data/com.android.launcher3/databases/launcher.db
+adb push android/launcher.db.de1plus81 /data/data/com.android.launcher3/databases/launcher.db
 adb shell am force-stop com.android.launcher3
 
 
