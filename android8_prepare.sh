@@ -160,9 +160,15 @@ adb shell am force-stop com.android.launcher3
 ###############################
 
 ###############################
-# install androwish
+# install Chrome
 echo "Installing Chrome"
 adb install android/chrome.apk 
+###############################
+
+###############################
+# install Chrome
+echo "Installing File Manager +"
+adb install android/filemanager.apk 
 ###############################
 
 
