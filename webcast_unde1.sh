@@ -1,10 +1,11 @@
 #!/bin/bash
 
+rm -rf webcast
+mkdir -p webcast
+cp -r /d/download/sync/de1plus webcast/.
+chown -R nobody webcast
+cd webcast/de1plus
+echo "Starting"
 export SDL_VIDEODRIVER=jsmpeg
-#export SDL_VIDEO_JSMPEG_OUTFILE=~/Desktop/decent.mpg
-/opt/tmp/undroidwish-x86_64-deb9 de1plus.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name Decent
-#desktop_app/linux/undroidwish/undroidwish-linux64 
-#/Applications/undroidwish.app/Contents/MacOS/undroidwish de1plus.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name Decent
-
-
-#~/Desktop/undroidwish.app/Contents/MacOS/undroidwish de1plus.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name Decent
+/d/admin/code/de1beta/desktop_app//linux/undroidwish/undroidwish-linux64 de1plus.tcl  -sdlheight 800 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name Decent
+echo "Exiting"
