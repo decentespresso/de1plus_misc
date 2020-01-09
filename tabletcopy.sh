@@ -8,6 +8,7 @@ adb pull /mnt/sdcard/de1plus/settings.tdb /tmp/settings.tdb
 adb shell rm -rf /mnt/sdcard/de1plus
 adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
 adb pull /sdcard/Pictures ~/Desktop
+adb pull /sdcard/Screenshots ~/Desktop
 
 #adb push *.tcl /mnt/sdcard/de1plus/
 #adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
