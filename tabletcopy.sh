@@ -12,8 +12,8 @@ adb pull /sdcard/Screenshots ~/Desktop
 
 #adb push *.tcl /mnt/sdcard/de1plus/
 #adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
-#adb push skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight
-#adb push skins/default/*.tcl /mnt/sdcard/de1plus/skins/default
+#adb push skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push skins/default/*.tcl /mnt/sdcard/de1plus/skins/default
+#
 
 #restore settings
 adb push /tmp/settings.tdb /mnt/sdcard/de1plus/settings.tdb 
