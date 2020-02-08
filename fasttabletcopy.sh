@@ -14,6 +14,19 @@
 adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
 mv /tmp/log.txt log_$SECONDS.txt
 adb push skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push *.tcl /mnt/sdcard/de1plus/
+
+#rm up.zip
+#rm -rf de1plus
+#mkdir de1plus
+#mkdir -p de1plus/skins/Insight
+#mkdir -p de1plus/skins/default
+#mkdir de1plus
+#cp *.tcl de1plus/.
+#cp skins/Insight/*.tcl de1plus/skins/Insight/.
+#cp skins/default/*.tcl de1plus/skins/default/.
+#zip -r de1plus_up.zip de1plus
+#rm -rf de1plus
+
 #
 
 #restore settings
