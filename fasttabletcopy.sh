@@ -13,7 +13,7 @@
 #adb push *.tcl /mnt/sdcard/de1plus/
 adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
 mv /tmp/log.txt log_$SECONDS.txt
-adb push skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push *.tcl /mnt/sdcard/de1plus/
+adb push skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push *.tcl /mnt/sdcard/de1plus/; adb push fonts/* /mnt/sdcard/de1plus/fonts
 
 #rm up.zip
 #rm -rf de1plus
