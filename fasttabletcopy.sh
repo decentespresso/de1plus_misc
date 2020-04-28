@@ -13,7 +13,8 @@
 #adb push *.tcl /mnt/sdcard/de1plus/
 adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
 mv /tmp/log.txt log_$SECONDS.txt
-adb push --sync skins/Insight/*.tcl skins/SWDark3/*.tcl skins/SWDark4/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push --sync skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push --sync *.tcl /mnt/sdcard/de1plus/; adb push --sync fonts/* /mnt/sdcard/de1plus/fonts
+#skins/SWDark3/*.tcl skins/SWDark4/*.tcl 
+adb push --sync skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push --sync skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push --sync *.tcl /mnt/sdcard/de1plus/; adb push --sync fonts/* /mnt/sdcard/de1plus/fonts
 
 #rm up.zip
 #rm -rf de1plus
@@ -30,4 +31,4 @@ adb push --sync skins/Insight/*.tcl skins/SWDark3/*.tcl skins/SWDark4/*.tcl /mnt
 #
 
 #restore settings
-adb push /tmp/settings.tdb /mnt/sdcard/de1plus/settings.tdb 
+#adb push /tmp/settings.tdb /mnt/sdcard/de1plus/settings.tdb 
