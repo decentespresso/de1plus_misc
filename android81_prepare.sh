@@ -1,5 +1,7 @@
 #!/bin/bash
 
+adb shell 'echo default_font_calibration .6 >>/sdcard/de1plus/settings.tdb'
+
 ###############################
 # NOTES:
 # first put the tablet manually into adb-receptive mode
