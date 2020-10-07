@@ -124,11 +124,11 @@ echo "Setting wallpaper"
 adb shell am start -a android.intent.action.ATTACH_DATA -c android.intent.category.DEFAULT -d file:///mnt/sdcard/de1plus/wallpaper/spy_2560x1600.jpg -t 'image/*'  -e mimeType 'image/*'
 sleep 2
 adb shell input tap 610 630
-sleep 1
+sleep 2
 adb shell input tap 910 690
 sleep 3
 adb shell input tap 140 50
-sleep 1
+sleep 3
 adb shell input tap 450 480
 sleep 1
 adb shell am force-stop com.android.settings 
@@ -161,6 +161,11 @@ sleep 1
 adb shell am force-stop tk.tcl.wish
 ###############################
 
+###############################
+# enable do not disturb
+adb shell input draganddrop 640 13 640 400 100
+adb shell input tap 605 125
+adb shell input tap 200 200
 
 ###############################
 # replace the launcher3 database with our own, which moves the icons where we want them and removes all tne toolbar noise of all those google icons
