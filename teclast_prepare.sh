@@ -10,6 +10,9 @@
 # more keycode docs: https://stackoverflow.com/questions/7789826/adb-shell-input-events
 ###############################
 
+# disable rotation
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 
 ###############################
 # go to home screen
@@ -138,6 +141,8 @@ adb shell input tap 140 50
 sleep 3
 adb shell input tap 450 480
 sleep 1
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
+sleep 1
 adb shell am force-stop com.android.settings 
 sleep 0.3
 adb shell input keyevent KEYCODE_HOME
@@ -228,6 +233,8 @@ sleep 0.3
 # moveing back to home page
 adb shell input keyevent KEYCODE_HOME
 
+# enable rotation
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 
 
 ###############################
