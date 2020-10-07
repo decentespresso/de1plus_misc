@@ -1,5 +1,20 @@
 #!/usr/local/bin/tclsh
 
+source pkgIndex.tcl
+package require de1_updater
+package require de1_utils
+package require de1_vars
+package require de1_misc
+package provide de1plus 1.0
+#package require md5
+package require sha256
+package require crc32
+package require snit
+package require de1_gui 
+
+
+make_de1_dir
+
 puts "Making release version of de1beta->de1plus"
 
 file delete -force /d/download/desktop/osx/decent_osx_stable_prev.zip

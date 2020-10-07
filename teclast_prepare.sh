@@ -151,16 +151,6 @@ sleep 0.3
 ###############################
 
 ###############################
-# connect to decent wifi
-adb shell am start -a android.settings.WIFI_SETTINGS
-sleep 0.5
-adb shell input tap 640 245
-sleep 0.5
-adb shell input text decent99
-sleep 0.5
-adb shell input keyevent 66
-
-###############################
 # install androwish
 echo "Installing Androwish"
 adb install android/androwish.apk 
@@ -236,6 +226,18 @@ adb shell input keyevent KEYCODE_HOME
 # enable rotation
 adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 
+###############################
+# connect to decent wifi
+adb shell am start -a android.settings.WIFI_SETTINGS
+sleep 0.5
+adb shell input tap 640 245
+sleep 0.5
+adb shell input text decent99
+sleep 0.5
+adb shell input keyevent 66
+
+# run decent app to confirm 
+adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/de1plus.tcl
 
 ###############################
 # disable developer mode so that people aren't asked if they want to trust this pc
