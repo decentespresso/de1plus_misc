@@ -112,6 +112,12 @@ echo "Installing File Manager +"
 adb install android/filemanager.apk 
 ###############################
 
+###############################
+# disable google home screen app 
+adb shell input draganddrop 200 200 200 200 1000
+adb shell input tap 365 425
+adb shell input tap 1233 163
+adb shell input keyevent KEYCODE_HOME
 
 ###############################
 # install wallpaper
