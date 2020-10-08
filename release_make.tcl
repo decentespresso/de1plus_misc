@@ -17,16 +17,18 @@ make_de1_dir
 
 puts "Making release version of de1beta->de1plus"
 
-file delete -force /d/download/desktop/osx/decent_osx_stable_prev.zip
-file delete -force /d/download/desktop/win32/decent_win_stable_prev.zip
-file delete -force /d/download/desktop/linux/decent_linux_stable_prev.zip
-file delete -force /d/download/desktop/source/decent_source_stable_prev.zip
-file delete -force /d/download/sync/de1plus
+catch {
+	file delete -force /d/download/desktop/osx/decent_osx_stable_prev.zip
+	file delete -force /d/download/desktop/win32/decent_win_stable_prev.zip
+	file delete -force /d/download/desktop/linux/decent_linux_stable_prev.zip
+	file delete -force /d/download/desktop/source/decent_source_stable_prev.zip
+	file delete -force /d/download/sync/de1plus
 
-file rename -force /d/download/desktop/osx/decent_osx_stable.zip /d/download/desktop/osx/decent_osx_stable_prev.zip
-file rename -force /d/download/desktop/win32/decent_win_stable.zip /d/download/desktop/win32/decent_win_stable_prev.zip
-file rename -force /d/download/desktop/linux/decent_linux_stable.zip /d/download/desktop/linux/decent_linux_stable_prev.zip
-file rename -force /d/download/desktop/source/decent_source_stable.zip /d/download/desktop/source/decent_source_stable_prev.zip
+	file rename -force /d/download/desktop/osx/decent_osx_stable.zip /d/download/desktop/osx/decent_osx_stable_prev.zip
+	file rename -force /d/download/desktop/win32/decent_win_stable.zip /d/download/desktop/win32/decent_win_stable_prev.zip
+	file rename -force /d/download/desktop/linux/decent_linux_stable.zip /d/download/desktop/linux/decent_linux_stable_prev.zip
+	file rename -force /d/download/desktop/source/decent_source_stable.zip /d/download/desktop/source/decent_source_stable_prev.zip
+}
 
 puts "- Mac"
 file copy -force /d/download/desktop/osx/decent_osx.zip /d/download/desktop/osx/decent_osx_stable.zip
