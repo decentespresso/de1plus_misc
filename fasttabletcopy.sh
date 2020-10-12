@@ -17,7 +17,7 @@ adb pull /mnt/sdcard/de1plus/log.txt /tmp/log.txt
 adb push --sync skins/Insight/*.tcl /mnt/sdcard/de1plus/skins/Insight;adb push --sync skins/default/*.tcl /mnt/sdcard/de1plus/skins/default; adb push --sync *.tcl /mnt/sdcard/de1plus/; 
 #adb push --sync profiles/* /mnt/sdcard/de1plus/profiles
 #adb push --sync fw/*.dat /mnt/sdcard/de1plus/fw
-#adb push --sync fonts/* /mnt/sdcard/de1plus/fonts
+adb push --sync fonts/* /mnt/sdcard/de1plus/fonts
 
 #rm up.zip
 #rm -rf de1plus
