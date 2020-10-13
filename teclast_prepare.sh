@@ -225,6 +225,7 @@ adb shell input keyevent KEYCODE_HOME
 
 # enable rotation
 adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 
 ###############################
 # connect to decent wifi

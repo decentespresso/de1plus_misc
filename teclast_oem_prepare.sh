@@ -241,7 +241,8 @@ adb shell input keyevent 66
 # run decent app to confirm 
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/de1plus.tcl
 
-
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 
 ###############################
 # disable developer mode so that people aren't asked if they want to trust this pc
