@@ -8,7 +8,6 @@ package require de1_utils
 package require de1_vars
 package require de1_misc
 package provide de1plus 1.0
-#package require md5
 package require sha256
 package require crc32
 package require snit
