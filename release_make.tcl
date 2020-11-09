@@ -1,5 +1,7 @@
 #!/usr/local/bin/tclsh
 
+cd ../de1plus
+
 source pkgIndex.tcl
 package require de1_updater
 package require de1_utils
@@ -12,8 +14,9 @@ package require crc32
 package require snit
 package require de1_gui 
 
+cd ../misc
 
-make_de1_dir
+puts "Makede1: [exec ./makede1.tcl]"
 
 puts "Making release version of de1beta->de1plus"
 
