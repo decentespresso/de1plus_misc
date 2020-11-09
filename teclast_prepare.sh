@@ -88,14 +88,12 @@ adb shell content insert --uri content://settings/secure --bind name:s:user_setu
 ###############################
 
 ###############################
-# enable bluetooth
+echo "enable bluetooth"
 # echo "Enabling bluetooth"
 # john 19-11-19 not needed for android 8.1 as BLE is on by default
-#adb shell service call bluetooth_manager 8
-#adb shell service call bluetooth_manager 6
-# adb shell am start -a android.settings.BLUETOOTH_SETTINGS
-# adb shell input tap 200 300
-# adb shell am force-stop com.android.settings 
+adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+adb shell input tap 200 300
+adb shell am force-stop com.android.settings 
 ###############################
 
 
@@ -197,7 +195,7 @@ sleep 0.3
 
 
 echo "Creating de1+ icon"
-adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
+#adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
 sleep 3
 echo "Tapping on system dialog to accept de1+ icon"
