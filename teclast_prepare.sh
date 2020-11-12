@@ -10,7 +10,7 @@
 # more keycode docs: https://stackoverflow.com/questions/7789826/adb-shell-input-events
 ###############################
 
-# disable rotation
+echo "disable screen rotation"
 adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
 adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 
@@ -42,7 +42,7 @@ adb shell svc power stayon true
 
 ###############################
 
-# lower volume to zero
+echo "lower volume to zero"
 # from https://developer.android.com/reference/android/view/KeyEvent
 adb shell input keyevent KEYCODE_VOLUME_DOWN
 adb shell input keyevent KEYCODE_VOLUME_DOWN
@@ -76,7 +76,7 @@ adb shell am force-stop com.android.settings
 ###############################
 
 ###############################
-# enable "show taps" on screen
+echo "enable 'show taps' on screen"
 adb shell content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:1
 ###############################
 
@@ -197,8 +197,8 @@ adb shell input draganddrop 1250 390 25 100 100
 sleep 0.3
 
 
-echo "Creating de1 app icon"
-# adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
+echo "Creating decent app icon"
+#adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
 sleep 3
 echo "Tapping on system dialog to accept de1 app icon"
@@ -227,12 +227,12 @@ sleep 0.3
 # moveing back to home page
 adb shell input keyevent KEYCODE_HOME
 
-# enable rotation
+echo "enable screen rotation"
 adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 
 ###############################
-# connect to decent wifi
+echo "connect to decent wifi"
 adb shell am start -a android.settings.WIFI_SETTINGS
 sleep 0.5
 adb shell input tap 640 245
@@ -242,6 +242,7 @@ sleep 0.5
 adb shell input keyevent 66
 
 # run decent app to confirm 
+echo "run decent app to confirm"
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/de1plus.tcl
 
 ###############################
