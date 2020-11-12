@@ -40,16 +40,20 @@ if {$argv != ""} {
 	file delete -force "$desktoptarget/win32/decent_win.zip"
 	file delete -force "$desktoptarget/linux/decent_linux.zip"
 	file delete -force "$desktoptarget/source/decent_source.zip"
+	file delete -force "$desktoptarget/source/decent_source_stable.zip"
 
 	#skin_convert_all
 	make_de1_dir "." [list "$synctarget/de1beta"]
 
+	puts "Making OSX app"
 	cd "$miscdir/desktop_app/osx"
 	exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/osx/decent_osx.zip" Decent.app 
 
+	puts "Making Win32 app"
 	cd "$miscdir/desktop_app/win32"
 	exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/win32/decent_win.zip" ./
 
+	puts "Making Linux app"
 	cd "$miscdir/desktop_app/linux"
 	file attributes "undroidwish/undroidwish-linux32" -permission 0755
 	file attributes "undroidwish/undroidwish-linux64" -permission 0755
@@ -61,8 +65,11 @@ if {$argv != ""} {
 	file link "$miscdir/desktop_app/decent" "$miscdir/desktop_app/linux"
 	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/linux/decent_linux.zip" decent
 
+	puts "Making de1beta source zip"
 	cd "$synctarget"
 	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" de1beta
+	puts "Making de1plus (stable) source zip"
+	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
 
 } else {
 	#skin_convert_all

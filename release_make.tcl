@@ -41,8 +41,9 @@ file copy -force /d/download/desktop/win32/decent_win.zip  /d/download/desktop/w
 puts "- Linux"
 file copy -force /d/download/desktop/linux/decent_linux.zip /d/download/desktop/linux/decent_linux_stable.zip
 
-puts "- Source"
-file copy -force /d/download/desktop/source/decent_source.zip /d/download/desktop/source/decent_source_stable.zip
+# the makede1.tcl program now makes both beta and stable source zips, from the de1beta and de1plus dirctories
+#puts "- Source"
+#file copy -force /d/download/desktop/source/decent_source.zip /d/download/desktop/source/decent_source_stable.zip
 
 puts "- Sync"
 file copy -force /d/download/sync/de1beta /d/download/sync/de1plus
