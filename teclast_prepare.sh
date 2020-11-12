@@ -88,11 +88,12 @@ adb shell content insert --uri content://settings/secure --bind name:s:user_setu
 ###############################
 
 ###############################
-echo "enable bluetooth"
-# echo "Enabling bluetooth"
-# john 19-11-19 not needed for android 8.1 as BLE is on by default
+# enable bluetooth
+ echo "Enabling bluetooth"
 adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+sleep 0.5
 adb shell input tap 200 300
+sleep 0.5
 adb shell am force-stop com.android.settings 
 ###############################
 
@@ -103,7 +104,7 @@ echo "Copying Tablet App"
 #adb shell rm -rf /mnt/sdcard/de1plus
 #adb shell rm -rf /mnt/sdcard/backup_de1plus
 adb push /d/download/sync/de1plus /mnt/sdcard/de1plus
-echo "Making backup on tablet of DE1+ software"
+echo "Making backup on tablet of tablet app"
 adb shell cp -R /sdcard/de1plus /sdcard/backup_de1plus &
 ###############################
 
@@ -115,6 +116,7 @@ adb install android/filemanager.apk
 
 ###############################
 # disable google home screen app 
+echo "disable google home screen app "
 adb shell input draganddrop 200 200 200 200 1000
 adb shell input tap 365 425
 adb shell input tap 1233 163
@@ -123,12 +125,7 @@ adb shell input keyevent KEYCODE_HOME
 
 ###############################
 # install wallpaper
-#adb pull /data/system/users/0/wallpaper
-#adb pull /data/system/users/0/wallpaper_info.xml
 echo "Setting wallpaper"
-#adb push android/wallpaper_info.xml /data/system/users/0/wallpaper_info.xml
-#adb push wallpaper/spy_1280x800.jpg /data/system/users/0/wallpaper
-
 adb shell am start -a android.intent.action.ATTACH_DATA -c android.intent.category.DEFAULT -d file:///mnt/sdcard/de1plus/wallpaper/spy_2560x1600.jpg -t 'image/*'  -e mimeType 'image/*'
 sleep 2
 adb shell input tap 610 630
@@ -163,17 +160,22 @@ adb shell am force-stop tk.tcl.wish
 
 ###############################
 # enable do not disturb
+echo "Enable 'do not disturb' to stop annoying 'wifi available' Android sounds"
 adb shell input draganddrop 640 13 640 400 100
 adb shell input tap 605 125
 adb shell input tap 200 200
 
 ###############################
 # replace the launcher3 database with our own, which moves the icons where we want them and removes all tne toolbar noise of all those google icons
+# from android Launcher3-aosp-release.apk
+# need to apk install it and then run it, and then make it the default
+# Android 10 P80H uses a launcher that does not accept icon creation, so we need to replace it
 # adb pull /data/data/com.android.launcher3/databases/launcher.db android/launcher.db.de1plus81b
 # adb pull /data/data/com.android.launcher3/databases/app_icons.db android/app_icons.db81b
 # adb pull /data/data/com.android.launcher3/databases/widgetpreviews.db android/widgetpreviews.db81b
 
 # remove 3 icons on the bottom
+echo "Remove 3 icons on the bottom"
 adb shell input draganddrop 170 650 25 100 100
 sleep 0.3
 adb shell input draganddrop 340 650 25 100 100
@@ -182,6 +184,7 @@ adb shell input draganddrop 1050 650 25 100 100
 sleep 0.3
 
 # remove sidebar icons
+echo "Remove sidebar icons"
 adb shell input draganddrop 1250 650 25 100 100
 sleep 0.3
 adb shell input draganddrop 1250 650 25 100 100
@@ -194,17 +197,18 @@ adb shell input draganddrop 1250 390 25 100 100
 sleep 0.3
 
 
-echo "Creating de1+ icon"
-#adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
+echo "Creating de1 app icon"
+# adb shell 'echo default_font_calibration .6 >>/mnt/sdcard/de1plus/settings.tdb'
 adb shell am start -W -n tk.tcl.wish/.AndroWishLauncher -a android.intent.action.ACTION_VIEW -e arg file:///sdcard/de1plus/create_de1plus_icon.tcl
 sleep 3
-echo "Tapping on system dialog to accept de1+ icon"
+echo "Tapping on system dialog to accept de1 app icon"
 adb shell input tap 900 530
 sleep 1
 adb shell am force-stop tk.tcl.wish
 sleep 1
 
 # move the Decent icon
+echo "Move the de1 app icon"
 adb shell input draganddrop 160 120 600 400 100
 sleep 0.3
 
@@ -215,7 +219,9 @@ echo "Tapping on system dialog to accept cloud upload icon"
 adb shell input tap 900 530
 sleep 1
 adb shell am force-stop tk.tcl.wish
+
 # move the cloud update icon
+echo "Move the de1 cloud update app icon"
 adb shell input draganddrop 160 120 700 400 100
 sleep 0.3
 # moveing back to home page
