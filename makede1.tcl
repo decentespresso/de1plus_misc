@@ -23,19 +23,19 @@ package require crc32
 package require snit
 package require de1_gui 
 
-catch { file link  "$miscdir/desktop_app/linux/src" "$synctarget/de1beta" }
-catch { file link  "$miscdir/desktop_app/osx/Decent.app/Contents/Resources/de1plus" "$synctarget/de1beta" }
-catch { file link  "$miscdir/desktop_app/win32/src" "$synctarget/de1beta" }
+catch { file link  "$miscdir/desktop_app/linux/src" "$synctarget/de1nightly" }
+catch { file link  "$miscdir/desktop_app/osx/Decent.app/Contents/Resources/de1plus" "$synctarget/de1nightly" }
+catch { file link  "$miscdir/desktop_app/win32/src" "$synctarget/de1nightly" }
 
-if {$argv != ""} {
+if {[lindex $argv 0] == "1"} {
 	puts "Updating apps"
 
 	# optionally purge the source directories and resync
 	# do this if we remove files from the sync list
-	file delete -force "$synctarget/de1beta"
+	file delete -force "$synctarget/de1nightly"
 	file delete -force "$synctarget/decent"
-	file mkdir "$synctarget/de1beta"
-	file link "$synctarget/decent" "$synctarget/de1beta"
+	file mkdir "$synctarget/de1nightly"
+	file link "$synctarget/decent" "$synctarget/de1nightly"
 	file delete -force "$desktoptarget/osx/decent_osx.zip"
 	file delete -force "$desktoptarget/win32/decent_win.zip"
 	file delete -force "$desktoptarget/linux/decent_linux.zip"
@@ -43,7 +43,7 @@ if {$argv != ""} {
 	file delete -force "$desktoptarget/source/decent_source_stable.zip"
 
 	#skin_convert_all
-	make_de1_dir "." [list "$synctarget/de1beta"]
+	make_de1_dir "." [list "$synctarget/de1nightly"]
 
 	puts "Making OSX app"
 	cd "$miscdir/desktop_app/osx"
@@ -65,15 +65,15 @@ if {$argv != ""} {
 	file link "$miscdir/desktop_app/decent" "$miscdir/desktop_app/linux"
 	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/linux/decent_linux.zip" decent
 
-	puts "Making de1beta source zip"
+	puts "Making source zip"
 	cd "$synctarget"
-	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" de1beta
-	puts "Making de1plus (stable) source zip"
-	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
+	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" de1nightly
+	#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_beta.zip" de1beta
+	#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
 
 } else {
 	#skin_convert_all
-	make_de1_dir "." [list "$synctarget/de1beta"]
+	make_de1_dir "." [list "$synctarget/de1nightly"]
 
 }
 
