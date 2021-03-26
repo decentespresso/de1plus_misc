@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cd /d/admin/code/de1app/misc
+cd /d/admin/git/de1beta/misc
 
 while true; do
-./nightly_build.sh
+./beta_build.sh
 echo "sleeping for 30m"
 sleep 1800
 done
