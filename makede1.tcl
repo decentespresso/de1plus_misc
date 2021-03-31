@@ -40,7 +40,7 @@ if {[lindex $argv 0] == "1"} {
 	file delete -force "$desktoptarget/win32/decent_win.zip"
 	file delete -force "$desktoptarget/linux/decent_linux.zip"
 	file delete -force "$desktoptarget/source/decent_source.zip"
-	file delete -force "$desktoptarget/source/decent_source_stable.zip"
+	#file delete -force "$desktoptarget/source/decent_source_stable.zip"
 
 	#skin_convert_all
 	make_de1_dir "." [list "$synctarget/de1nightly"]
