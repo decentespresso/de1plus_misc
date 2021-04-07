@@ -7,4 +7,4 @@ git submodule update --init --recursive
 
 cd de1plus
 ../misc/makede1.tcl 1 >/d/nightly.log 2>&1
-
+cat /d/nightly.log
