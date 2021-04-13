@@ -4,6 +4,7 @@
 # also makes ZIP files of the BETA Desktop app for Linux/Windows/OSX/Source
 # this is not necessarily a useful script for anyone but Decent Espresso
 
+namespace eval ::logging { variable disable_logging_for_build True }
 
 set synctarget "/d/download/sync"
 set desktoptarget "/d/download/desktop"
