@@ -1,5 +1,7 @@
 #!/usr/local/bin/tclsh
 
+namespace eval ::logging { variable disable_logging_for_build True }
+
 cd ../de1plus
 
 source pkgIndex.tcl
