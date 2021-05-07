@@ -18,10 +18,6 @@ fi
 
 : "${BUILD_TIMESTAMP:=$(date +%s)}"
 
-: "${SED_SUFFIX:=".orig"}"
-
-
-
 # As this might be envoked from within a submodule,
 # confirm that we're talking about the proper repo
 
@@ -179,7 +175,7 @@ fi
 if [ "$this_version" != "$current_version" ] ; then
     cvre=$(printf "%s" "$current_version" | sed -e 's/\./\\./g')
     tvre=$(printf "%s" "$this_version" | sed -e 's/\./\\./g')
-    sed -i "$SED_SUFFIX" -e "s/$cvre/$tvre/g" $VERSION_TCL
+    sed -i -e "s/$cvre/$tvre/g" $VERSION_TCL
     err=$?
 
     if [ $err != 0 ] ; then
