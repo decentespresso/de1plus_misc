@@ -7,6 +7,7 @@ git checkout origin/main -B main --force
 git submodule update --init --recursive
 
 cd de1plus
-../misc/create_build_info.sh  1 >/d/nightly.log 2>&1
+echo "Current directory is $PWD"
+bash ../misc/create_build_info.sh  1 >/d/nightly.log 2>&1
 ../misc/makede1.tcl 1 >>/d/nightly.log 2>&1
 cat /d/nightly.log
