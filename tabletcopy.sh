@@ -6,7 +6,7 @@
 adb pull /mnt/sdcard/de1plus/settings.tdb /tmp/settings.tdb
 
 adb shell rm -rf /mnt/sdcard/de1plus
-adb push /d/download/sync/de1nightly/* /mnt/sdcard/de1plus
+adb push /d/download/sync/de1nightly /mnt/sdcard/de1plus
 
 adb pull /sdcard/Pictures ~/Desktop
 adb pull /sdcard/Screenshots ~/Desktop
