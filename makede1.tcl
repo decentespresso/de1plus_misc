@@ -83,6 +83,6 @@ file delete "$miscdir/osx/Decent.app/Contents/Resources/de1plus"
 file delete "$miscdir/win32/src"
 
 puts "Success"
-
+exit
 
 
