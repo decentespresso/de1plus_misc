@@ -13,7 +13,7 @@ fi
 
 : "${DE1PLUS:="${GIT_ROOT}/de1plus"}"
 
-: "${BUILD_INFO:="${DE1PLUS}/build-info"}"
+: "${BUILD_INFO:="${DE1PLUS}/build-info.txt"}"
 : "${VERSION_TCL:="${DE1PLUS}/version.tcl"}"
 
 : "${BUILD_TIMESTAMP:=$(date +%s)}"
