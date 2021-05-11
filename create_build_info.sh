@@ -16,8 +16,6 @@ fi
 : "${BUILD_INFO:="${DE1PLUS}/build-info.txt"}"
 : "${VERSION_TCL:="${DE1PLUS}/version.tcl"}"
 
-: "${BUILD_TIMESTAMP:=$(date +%s)}"
-
 # As this might be envoked from within a submodule,
 # confirm that we're talking about the proper repo
 
@@ -134,7 +132,6 @@ fi
 printf "# DO NOT EDIT - Automatically generated\\n" > $BUILD_INFO
 
 printf "version_string\\t%s\\n" "$this_version_string" >> $BUILD_INFO
-printf "build_timestamp\\t%s\\n" "$BUILD_TIMESTAMP" >> $BUILD_INFO
 printf "last_commit_hash\\t%s\\n" "$(last_commit_hash)" >> $BUILD_INFO
 printf "last_commit_time\\t%s\\n" "$(last_commit_time)" >> $BUILD_INFO
 
