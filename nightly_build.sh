@@ -6,6 +6,7 @@ git fetch --recurse-submodules
 git checkout origin/main -B main --force
 # This will update this script as it lives in misc
 git submodule update --init --recursive
+git -C misc clean -xdf
 
 cd de1plus
 echo "Current directory is $PWD"
