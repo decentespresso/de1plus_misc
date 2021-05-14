@@ -10,7 +10,8 @@ set synctarget "/d/download/sync"
 set desktoptarget "/d/download/desktop"
 
 if { $argc != 2 } {
-        puts "The script requires the output folder to write."
+        puts "The script requires the output folder to write.\n"
+        puts "for example:\n\n../misc/makede1.tcl nightly 1\n"
         return
 }
 
