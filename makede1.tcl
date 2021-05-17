@@ -39,46 +39,55 @@ catch { file link  "$miscdir/desktop_app/win32/src" "$synctarget/$release_target
 if {[lindex $argv 1] == "1"} {
 	puts "Updating apps"
 
-	# optionally purge the source directories and resync
+	# old comment - optionally purge the source directories and resync
 	# do this if we remove files from the sync list
-	file delete -force "$synctarget/$release_target"
+
+	# new comment 17-5-21 : since git removes stale files, but cvs does not, we can now skip 
+	# purging the destination dir, as it just increases work
+	# file delete -force "$synctarget/$release_target"
+	
+	catch {
+		file mkdir "$synctarget/$release_target"
+	}
+	
 	file delete -force "$synctarget/decent"
-	file mkdir "$synctarget/$release_target"
 	file link "$synctarget/decent" "$synctarget/$release_target"
-	file delete -force "$desktoptarget/osx/decent_osx.zip"
-	file delete -force "$desktoptarget/win32/decent_win.zip"
-	file delete -force "$desktoptarget/linux/decent_linux.zip"
-	file delete -force "$desktoptarget/source/decent_source.zip"
-	#file delete -force "$desktoptarget/source/decent_source_stable.zip"
 
-	#skin_convert_all
-	make_de1_dir "." [list "$synctarget/$release_target"]
+	set files_copied [make_de1_dir "." [list "$synctarget/$release_target"]]
 
-	puts "Making OSX app"
-	cd "$miscdir/desktop_app/osx"
-	exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/osx/decent_osx.zip" Decent.app 
+	if {$files_copied != 0} {
 
-	puts "Making Win32 app"
-	cd "$miscdir/desktop_app/win32"
-	exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/win32/decent_win.zip" ./
+		file delete -force "$desktoptarget/osx/decent_osx.zip"
+		file delete -force "$desktoptarget/win32/decent_win.zip"
+		file delete -force "$desktoptarget/linux/decent_linux.zip"
+		file delete -force "$desktoptarget/source/decent_source.zip"
 
-	puts "Making Linux app"
-	cd "$miscdir/desktop_app/linux"
-	file attributes "undroidwish/undroidwish-linux32" -permission 0755
-	file attributes "undroidwish/undroidwish-linux64" -permission 0755
-	file attributes "undroidwish/undroidwish-raspberry" -permission 0755
-	file attributes "undroidwish/undroidwish-wayland64" -permission 0755
+		puts "Making OSX app"
+		cd "$miscdir/desktop_app/osx"
+		exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/osx/decent_osx.zip" Decent.app 
 
-	cd "$miscdir/desktop_app/"
-	file delete -force "$miscdir/desktop_app/decent"
-	file link "$miscdir/desktop_app/decent" "$miscdir/desktop_app/linux"
-	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/linux/decent_linux.zip" decent
+		puts "Making Win32 app"
+		cd "$miscdir/desktop_app/win32"
+		exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/win32/decent_win.zip" ./
 
-	puts "Making source zip"
-	cd "$synctarget"
-	exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" $release_target
-	#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_beta.zip" de1beta
-	#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
+		puts "Making Linux app"
+		cd "$miscdir/desktop_app/linux"
+		file attributes "undroidwish/undroidwish-linux32" -permission 0755
+		file attributes "undroidwish/undroidwish-linux64" -permission 0755
+		file attributes "undroidwish/undroidwish-raspberry" -permission 0755
+		file attributes "undroidwish/undroidwish-wayland64" -permission 0755
+
+		cd "$miscdir/desktop_app/"
+		file delete -force "$miscdir/desktop_app/decent"
+		file link "$miscdir/desktop_app/decent" "$miscdir/desktop_app/linux"
+		exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/linux/decent_linux.zip" decent
+
+		puts "Making source zip"
+		cd "$synctarget"
+		exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" $release_target
+		#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_beta.zip" de1beta
+		#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
+	}
 
 } else {
 	#skin_convert_all
