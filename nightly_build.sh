@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd /d/admin/code/de1app
+date
 git checkout de1plus/version.tcl
 git fetch --recurse-submodules
 git checkout origin/main -B main --force
