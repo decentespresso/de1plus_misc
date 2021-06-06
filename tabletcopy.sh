@@ -1,6 +1,6 @@
 #!/bin/bash
 
-../misc/makede1.tcl
+../misc/makede1.tcl de1nightly 0
 
 # back up settings
 adb pull /mnt/sdcard/de1plus/settings.tdb /tmp/settings.tdb
