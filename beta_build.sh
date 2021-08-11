@@ -3,7 +3,7 @@
 cd /d/admin/code/de1beta-release
 git checkout de1plus/version.tcl
 git fetch --recurse-submodules
-git checkout origin/beta-1.36 -B beta --force
+git checkout origin/beta -B beta --force
 # This will update this script as it lives in misc
 git submodule update --init --recursive
 git -C misc clean -xdf

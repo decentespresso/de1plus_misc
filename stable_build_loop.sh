@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /d/admin/code/de1beta-release/misc
+cd /d/admin/code/de1stable/misc
 
 while true; do
 ./beta_build.sh
