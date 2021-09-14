@@ -12,5 +12,5 @@ cd de1plus
 echo "Current directory is $PWD" >/d/stable.log 2>&1
 date >>/d/stable.log 2>&1
 ../misc/create_build_info.sh  1 >>/d/stable.log 2>&1
-../misc/makede1.tcl de1beta 1 >>/d/stable.log 2>&1
+../misc/makede1.tcl de1plus 1 >>/d/stable.log 2>&1
 cat /d/beta.log
