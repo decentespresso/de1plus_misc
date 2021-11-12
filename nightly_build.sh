@@ -13,5 +13,5 @@ git submodule update --init --recursive  2>&1 | tee -a /d/nightly.log
 git -C misc clean -xdf 2>&1 | tee -a /d/nightly.log 
 
 cd de1plus
-x../misc/create_build_info.sh 1 2>&1 | tee -a /d/nightly.log 
+../misc/create_build_info.sh 1 2>&1 | tee -a /d/nightly.log 
 ../misc/makede1.tcl de1nightly 1 2>&1 | tee -a /d/nightly.log 
