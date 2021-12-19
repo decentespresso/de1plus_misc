@@ -2,7 +2,7 @@
 
 cd /d/admin/code/de1app
 echo "" > /d/nightly.log
-echo "Current directory is $PWD" 2>&1 | tee -a /d/beta.log
+echo "Current directory is $PWD" 2>&1 | tee -a /d/nightly.log
 date 2>&1 | tee -a /d/nightly.log 
 git checkout de1plus/version.tcl 2>&1 | tee -a /d/nightly.log
 git fetch --recurse-submodules 2>&1 | tee -a /d/nightly.log

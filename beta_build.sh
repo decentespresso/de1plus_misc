@@ -3,7 +3,7 @@
 cd /d/admin/code/de1beta-release
 echo "" > /d/beta.log
 echo "Current directory is $PWD" 2>&1 | tee -a /d/beta.log
-date 2>&1 | tee -a /d/nightly.log 
+date 2>&1 | tee -a /d/beta.log 
 git checkout de1plus/version.tcl 2>&1 | tee -a /d/beta.log
 git fetch --recurse-submodules 2>&1 | tee -a /d/beta.log
 git fetch --tags -f 2>&1 | tee -a /d/beta.log
