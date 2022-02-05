@@ -189,16 +189,15 @@ fi
 # Add submodule information
 #
 
-IFS=$'\n'
-for sm_path in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
-
+IFS=$'\n'; for sm in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
+    echo "getting info on $sm-"
     printf "#\\n" >> $BUILD_INFO
     printf "%s/_version_string\\t%s\\n" \
-	   "$sm_path" "$(cd "$sm_path" ; safe_git_describe)" >> $BUILD_INFO
+	   "$sm" "$(cd "$sm" ; safe_git_describe)" >> $BUILD_INFO
     printf "%s/_last_commit_hash\\t%s\\n" \
-	   "$sm_path" "$(cd "$sm_path" ; last_commit_hash)" >> $BUILD_INFO
+	   "$sm" "$(cd "$sm" ; last_commit_hash)" >> $BUILD_INFO
     printf "%s/_last_commit_time\\t%s\\n" \
-	   "$sm_path" "$(cd "$sm_path" ; last_commit_time)" >> $BUILD_INFO
+	   "$sm" "$(cd "$sm" ; last_commit_time)" >> $BUILD_INFO
 
 done
 
