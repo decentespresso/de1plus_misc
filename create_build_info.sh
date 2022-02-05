@@ -190,7 +190,7 @@ fi
 #
 
 IFS=$'\n'
-for sm_path in $(git submodule -q foreach --recursive 'echo "$sm_path"') ; do
+for sm_path in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
 
     printf "#\\n" >> $BUILD_INFO
     printf "%s/_version_string\\t%s\\n" \
