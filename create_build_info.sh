@@ -189,8 +189,8 @@ fi
 # Add submodule information
 #
 
-IFS='\n'; for sm in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
-    echo "getting info on $sm"
+IFS=$'\n'; for sm in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
+    echo "getting info on $sm-"
     printf "#\\n" >> $BUILD_INFO
     printf "%s/_version_string\\t%s\\n" \
 	   "$sm" "$(cd "$sm" ; safe_git_describe)" >> $BUILD_INFO
