@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (C) 2021 Jeff Kletsky, All Rights Reserved
 # License granted under GPL-3.0-only
@@ -189,8 +189,7 @@ fi
 # Add submodule information
 #
 
-IFS="$(printf '\n')"
-for sm in $(git submodule -q foreach --recursive 'echo $sm_path') ; do
+IFS=$'\n'; for sm in $(git submodule -q foreach --recursive 'echo \"$sm_path\"') ; do
     echo "getting info on $sm"
     printf "#\\n" >> $BUILD_INFO
     printf "%s/_version_string\\t%s\\n" \
