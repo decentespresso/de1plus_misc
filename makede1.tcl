@@ -6,9 +6,6 @@
 
 namespace eval ::logging { variable disable_logging_for_build True }
 
-set synctarget "/d/download/sync"
-set desktoptarget "/d/download/desktop"
-
 if { $argc != 2 } {
         puts "The script requires the output folder to write.\n"
         puts "for example:\n\n../misc/makede1.tcl nightly 1\n"
@@ -16,6 +13,8 @@ if { $argc != 2 } {
 }
 
 set release_target [lindex $argv 0]
+set synctarget "/d/download/sync"
+set desktoptarget "/d/download/desktop/$release_target"
 
 set miscdir [file normalize [file dirname [info script]]]
 cd  $miscdir
