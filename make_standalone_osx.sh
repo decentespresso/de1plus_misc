@@ -99,7 +99,7 @@ rsync -aL --delete \
 #    The committed helper is already signed and rsync -a preserves it; we only
 #    re-sign if that is somehow not the case, so a normal build needs no network.
 # ---------------------------------------------------------------------------
-HELPER="$RES/ble/bin/ble_helper"
+HELPER="$RES/ble/bin/ble_helper.bin"
 if [ -f "$HELPER" ]; then
     chmod +x "$HELPER"
     if [ "$OS" != "Darwin" ]; then
