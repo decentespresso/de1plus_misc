@@ -13,18 +13,30 @@
 # runs `git -C misc clean -xdf`, which deletes untracked files in misc/ — that is
 # what wiped the previous copy. Keep it out of misc/ (here), or git-track+push it.
 #
+# CROSS-PLATFORM: builds on macOS (Darwin) AND on a Linux server. The output is
+# always a macOS .app, so on Linux two macOS-specific things change:
+#   * codesign does not exist → BLE-helper (re)signing is skipped; we rely on the
+#     Developer-ID signature already committed in ble/bin/ble_helper, which rsync
+#     carries over verbatim. (To re-sign, run on a Mac, or sign afterwards.)
+#   * the bundled interpreter must be a *macOS* undroidwish, so PATH auto-detect is
+#     disabled on Linux — you MUST pass DECENT_WISH=<path to a macOS undroidwish>.
+#
 # Usage:
 #   /d/admin/code/de1app/make_standalone_osx.sh
 # Env overrides:
 #   DECENT_WISH=<path>   interpreter to bundle (e.g. undroidwish-arm64 for arm64 builds)
-#   BLE_SIGN_ID=<id>     codesign identity for the BLE helper
+#                        REQUIRED on Linux (must point at a macOS undroidwish binary)
+#   BLE_SIGN_ID=<id>     codesign identity for the BLE helper (macOS only)
+#   APP_OUT=<path>       output .app path (default ~/Desktop/Decent.app)
 #
 set -euo pipefail
+
+OS="$(uname -s)"   # Darwin (macOS) or Linux
 
 REPO="/d/admin/code/de1app"
 SRC="$REPO/de1plus"
 SKEL="$REPO/misc/desktop_app/osx/Decent.app"
-APP="$HOME/Desktop/Decent.app"
+APP="${APP_OUT:-$HOME/Desktop/Decent.app}"
 RES="$APP/Contents/Resources/de1plus"
 
 [ -d "$SRC" ]  || { echo "ERROR: source tree not found: $SRC"  >&2; exit 1; }
@@ -37,6 +49,12 @@ RES="$APP/Contents/Resources/de1plus"
 # ---------------------------------------------------------------------------
 if [ -n "${DECENT_WISH:-}" ]; then
     WISH="$DECENT_WISH"
+elif [ "$OS" = "Linux" ]; then
+    # PATH 'undroidwish' on Linux is the LINUX binary, which cannot run inside a
+    # macOS .app. Force the caller to hand us a macOS interpreter explicitly.
+    echo "ERROR: on Linux you must set DECENT_WISH=<path to a macOS undroidwish binary>." >&2
+    echo "       (PATH auto-detect is disabled here because it would pick the Linux build.)" >&2
+    exit 1
 else
     RAW="$(command -v undroidwish)" || { echo "ERROR: 'undroidwish' not on PATH (set DECENT_WISH=...)" >&2; exit 1; }
     # resolve symlinks (readlink -f on modern macOS; perl abs_path as a fallback)
@@ -84,7 +102,12 @@ rsync -aL --delete \
 HELPER="$RES/ble/bin/ble_helper"
 if [ -f "$HELPER" ]; then
     chmod +x "$HELPER"
-    if codesign -dvv "$HELPER" 2>&1 | grep -q "Authority=Developer ID Application: Vid Tadel" \
+    if [ "$OS" != "Darwin" ]; then
+        # No codesign on Linux. The committed helper is already Developer-ID
+        # signed and rsync -a preserved that signature, so the bundle is usable
+        # as-is. We just can't (re)sign or verify here.
+        echo "ble_helper : codesign unavailable on $OS — keeping the committed Developer-ID signature (carried over by rsync)."
+    elif codesign -dvv "$HELPER" 2>&1 | grep -q "Authority=Developer ID Application: Vid Tadel" \
        && codesign --verify --strict "$HELPER" 2>/dev/null; then
         echo "ble_helper : already Developer-ID signed and valid — kept."
     else
