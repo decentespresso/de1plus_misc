@@ -85,14 +85,23 @@ if {[lindex $argv 1] == "1"} {
 		# `git -C misc clean -xdf` (run before this script) can't wipe it.
 		# Wrapped in catch: a signing/notarization hiccup must not abort the rest
 		# of the build (linux/win32/source still get made).
-		puts "Making OSX arm64 app (signed + notarized)"
-		if {[catch {
-			exec [file join $miscdir .. make_osx_arm64_signed.sh] \
-				"$synctarget/$release_target" \
-				"$desktoptarget/osx_arm64/decent_osx_arm64.zip" \
-				>@ stdout 2>@ stderr
-		} err]} {
-			puts "WARNING: arm64 OSX build failed: $err"
+		# The arm64 build is Developer-ID signed + NOTARIZED, which only works on
+		# macOS (codesign + xcrun notarytool). A Linux build server physically
+		# can't do it, so skip cleanly there -- the arm64 zip is produced by a
+		# separate macOS run. (catch-wrapped on macOS too, so a signing hiccup
+		# doesn't abort the linux/win32/source zips.)
+		if {$::tcl_platform(os) eq "Darwin"} {
+			puts "Making OSX arm64 app (signed + notarized)"
+			if {[catch {
+				exec [file join $miscdir .. make_osx_arm64_signed.sh] \
+					"$synctarget/$release_target" \
+					"$desktoptarget/osx_arm64/decent_osx_arm64.zip" \
+					>@ stdout 2>@ stderr
+			} err]} {
+				puts "WARNING: arm64 OSX build failed: $err"
+			}
+		} else {
+			puts "Skipping OSX arm64 app: signed+notarized build is macOS-only (produced by a separate Mac run)"
 		}
 
 		puts "Making Win32 app"
