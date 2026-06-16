@@ -29,7 +29,13 @@ package provide de1plus 1.0
 package require sha256
 package require crc32
 package require snit
-package require de1_gui 
+package require de1_gui
+
+# The sync target must exist BEFORE the symlinks below: Tcl 'file link' fails if
+# the target doesn't exist yet. On a fresh checkout (a brand-new build server
+# that never ran a build) the dir is absent, so these links silently failed and
+# the OSX/win32/linux zips shipped with NO de1plus payload (a tiny broken zip).
+catch { file mkdir "$synctarget/$release_target" }
 
 catch { file link  "$miscdir/desktop_app/linux/src" "$synctarget/$release_target" }
 catch { file link  "$miscdir/desktop_app/osx/Decent.app/Contents/Resources/de1plus" "$synctarget/$release_target" }
