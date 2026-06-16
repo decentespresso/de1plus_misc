@@ -1,4 +1,14 @@
 #!/bin/bash
 
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
+
+# macOS BLE: run the CoreBluetooth helper WITHOUT its disclaim self-re-exec, so
+# the Bluetooth (TCC) request attributes to THIS app (Decent.app /
+# com.tcltk.de1plus) -- which a user can actually grant -- instead of the
+# helper's own loose-binary identity, which macOS gives no way to grant.
+# Set here in the launcher (belt-and-suspenders with updater.tcl) so it covers
+# the whole process tree from the very first instruction. Used by both the x86
+# Decent.app and the arm64 build (which reuses this skeleton launcher).
+export BLE_HELPER_NO_REEXEC=1
+
 MacOS/wish Resources/de1plus/de1plus.tcl  -sdlheight 801 -sdlwidth 1280 -sdlrootheight 800 -sdlrootwidth 1280 -name DE1
