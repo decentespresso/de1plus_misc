@@ -89,15 +89,13 @@ if [ -f "$HELPER" ]; then
         echo "ble_helper : already Developer-ID signed and valid — kept."
     else
         SIGN_ID="${BLE_SIGN_ID:-Developer ID Application: Vid Tadel (XLS3XF57J8)}"
-        ENT="$RES/ble/ble_helper.entitlements"
-        echo "ble_helper : re-signing with '$SIGN_ID' ..."
-        if [ -f "$ENT" ]; then
-            codesign --force --options runtime --timestamp --entitlements "$ENT" \
-                --sign "$SIGN_ID" --identifier com.decentespresso.ble-helper "$HELPER"
-        else
-            codesign --force --options runtime --timestamp \
-                --sign "$SIGN_ID" --identifier com.decentespresso.ble-helper "$HELPER"
-        fi
+        # PLAIN Developer ID, NO hardened runtime (--options runtime): under
+        # hardened runtime the helper SIGABRT-crashes on the first-time Bluetooth
+        # grant instead of presenting the prompt (see ble/build.sh). The host app
+        # can't be notarized anyway, so hardened runtime buys nothing.
+        echo "ble_helper : re-signing (plain Developer ID) with '$SIGN_ID' ..."
+        codesign --force --timestamp \
+            --sign "$SIGN_ID" --identifier com.decentespresso.ble-helper "$HELPER"
         codesign --verify --strict "$HELPER" && echo "ble_helper : signature OK"
     fi
 else
