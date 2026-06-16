@@ -54,16 +54,34 @@ if {[lindex $argv 1] == "1"} {
 
 	set files_copied [make_de1_dir "." [list "$synctarget/$release_target"]]
 
-	if {$files_copied != 0} {
+	#if {$files_copied != 0} {
 
 		file delete -force "$desktoptarget/osx/decent_osx.zip"
+		file delete -force "$desktoptarget/osx_arm64/decent_osx_arm64.zip"
 		file delete -force "$desktoptarget/win32/decent_win.zip"
 		file delete -force "$desktoptarget/linux/decent_linux.zip"
 		file delete -force "$desktoptarget/source/decent_source.zip"
 
 		puts "Making OSX app"
 		cd "$miscdir/desktop_app/osx"
-		exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/osx/decent_osx.zip" Decent.app 
+		exec zip -u -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/osx/decent_osx.zip" Decent.app
+
+		# arm64 OSX build: Developer-ID-signed + notarized (unlike the x86 zip
+		# above, which ships the committed skeleton unsigned). Built on the fly
+		# by a helper at the repo root — it materialises its own de1plus payload
+		# and bundles the native arm64 undroidwish-arm64. Kept out of misc/ so
+		# `git -C misc clean -xdf` (run before this script) can't wipe it.
+		# Wrapped in catch: a signing/notarization hiccup must not abort the rest
+		# of the build (linux/win32/source still get made).
+		puts "Making OSX arm64 app (signed + notarized)"
+		if {[catch {
+			exec [file join $miscdir .. make_osx_arm64_signed.sh] \
+				"$synctarget/$release_target" \
+				"$desktoptarget/osx_arm64/decent_osx_arm64.zip" \
+				>@ stdout 2>@ stderr
+		} err]} {
+			puts "WARNING: arm64 OSX build failed: $err"
+		}
 
 		puts "Making Win32 app"
 		cd "$miscdir/desktop_app/win32"
@@ -86,7 +104,7 @@ if {[lindex $argv 1] == "1"} {
 		exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source.zip" $release_target
 		#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_beta.zip" de1beta
 		#exec zip -x "*CVS*" -x ".DS_Store" -r "$desktoptarget/source/decent_source_stable.zip" de1plus
-	}
+	#}
 
 } else {
 	#skin_convert_all
@@ -95,8 +113,8 @@ if {[lindex $argv 1] == "1"} {
 }
 
 file delete "$miscdir/desktop_app/linux/src"
-file delete "$miscdir/osx/Decent.app/Contents/Resources/de1plus"
-file delete "$miscdir/win32/src"
+file delete "$miscdir/desktop_app/osx/Decent.app/Contents/Resources/de1plus"
+file delete "$miscdir/desktop_app/win32/src"
 
 puts "Success"
 exit
