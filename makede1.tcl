@@ -62,6 +62,12 @@ if {[lindex $argv 1] == "1"} {
 
 	#if {$files_copied != 0} {
 
+		# Ensure the per-arch output dirs exist: 'exec zip' fails if its target
+		# directory is missing, which on a fresh build server (no prior build)
+		# aborted every zip step. file mkdir is idempotent + creates parents.
+		file mkdir "$desktoptarget/osx" "$desktoptarget/osx_arm64" \
+			"$desktoptarget/win32" "$desktoptarget/linux" "$desktoptarget/source"
+
 		file delete -force "$desktoptarget/osx/decent_osx.zip"
 		file delete -force "$desktoptarget/osx_arm64/decent_osx_arm64.zip"
 		file delete -force "$desktoptarget/win32/decent_win.zip"
