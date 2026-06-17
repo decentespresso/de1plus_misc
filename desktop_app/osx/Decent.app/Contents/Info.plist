@@ -77,6 +77,11 @@
 	<string>de1plus</string>
 	<key>CFBundleVersion</key>
 	<string>8.6.7</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>BLE_HELPER_NO_REEXEC</key>
+		<string>1</string>
+	</dict>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.5.0</string>
 	<key>LSRequiresCarbon</key>
