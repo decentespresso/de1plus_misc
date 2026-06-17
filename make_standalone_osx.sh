@@ -9,9 +9,10 @@
 # the macOS Bluetooth driver (ble/), and Developer-ID-signs the BLE helper so its
 # TCC Bluetooth grant is stable across paths/rebuilds.
 #
-# LOCATION NOTE: this lives at the de1app repo ROOT on purpose. nightly_build.sh
-# runs `git -C misc clean -xdf`, which deletes untracked files in misc/ — that is
-# what wiped the previous copy. Keep it out of misc/ (here), or git-track+push it.
+# LOCATION NOTE: this script and its launcher source (decent_launcher.c) live in
+# misc/ and MUST stay git-tracked. nightly_build.sh runs `git -C misc clean -xdf`,
+# which deletes any UNTRACKED file in misc/ — tracked files survive, untracked ones
+# (e.g. a freshly-added decent_launcher.c) get wiped. So always commit them.
 #
 # CROSS-PLATFORM: builds on macOS (Darwin) AND on a Linux server. The output is
 # always a macOS .app, so on Linux two macOS-specific things change:
@@ -38,6 +39,8 @@ SRC="$REPO/de1plus"
 SKEL="$REPO/misc/desktop_app/osx/Decent.app"
 APP="${APP_OUT:-$HOME/Desktop/Decent.app}"
 RES="$APP/Contents/Resources/de1plus"
+LAUNCHER_SRC="$REPO/misc/decent_launcher.c"
+SIGN_ID="${BLE_SIGN_ID:-Developer ID Application: Vid Tadel (XLS3XF57J8)}"
 
 [ -d "$SRC" ]  || { echo "ERROR: source tree not found: $SRC"  >&2; exit 1; }
 [ -d "$SKEL" ] || { echo "ERROR: app skeleton not found: $SKEL" >&2; exit 1; }
@@ -65,19 +68,44 @@ echo "Interpreter : $WISH"
 echo "Output app  : $APP"
 
 # ---------------------------------------------------------------------------
-# 2. Bundle scaffold from the skeleton (launchers / Info.plist / icons) — but NOT
-#    its stale wish, and NOT its symlinked de1plus (we lay down a real one below).
-#    --delete prunes stale skeleton files; the two excludes protect our payload.
+# 2. Bundle scaffold from the skeleton (Info.plist / icons / helper scripts) —
+#    but NOT its stale wish, and NOT its symlinked de1plus (real one below).
+#    --delete prunes stale skeleton files; the excludes protect our payload.
 # ---------------------------------------------------------------------------
 echo "Copying app skeleton ..."
 rsync -a --delete \
     --exclude 'Contents/Resources/de1plus' \
     --exclude 'Contents/MacOS/wish' \
     "$SKEL/" "$APP/"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-mkdir -p "$APP/Contents/MacOS"
-cp "$WISH" "$APP/Contents/MacOS/wish"
-chmod +x "$APP/Contents/MacOS/wish"
+# ---------------------------------------------------------------------------
+# 2b. Main executable — a compiled Mach-O launcher, NOT the skeleton's
+#     #!/bin/bash 'undroidwish' script. macOS 26 enforces a LAUNCH CONSTRAINT on
+#     /bin/bash and refuses to spawn it as an app's CFBundleExecutable (the app
+#     fails to open: "(null)" / error 162 / -54), no matter how it is signed.
+#     A real Mach-O main executable sidesteps the constraint.
+#
+#     The launcher execs the EXTERNAL interpreter resolved above (path written to
+#     Contents/Resources/interp); we do NOT bundle a copy of it — macOS 26 also
+#     refuses to re-host an already-notarized binary (undroidwish-arm64) inside
+#     another bundle. So the .app depends on that interpreter being installed
+#     (same as unde1plus.sh / unde1plus-arm64.sh).
+# ---------------------------------------------------------------------------
+printf '%s\n' "$WISH" > "$APP/Contents/Resources/interp"
+if [ "$OS" = "Darwin" ]; then
+    [ -f "$LAUNCHER_SRC" ] || { echo "ERROR: launcher source not found: $LAUNCHER_SRC" >&2; exit 1; }
+    echo "Compiling Mach-O launcher ..."
+    clang -arch arm64 -O2 -o "$APP/Contents/MacOS/Decent" "$LAUNCHER_SRC"
+    rm -f "$APP/Contents/MacOS/undroidwish"   # drop the old /bin/bash launcher
+    /usr/libexec/PlistBuddy -c "Set :CFBundleExecutable Decent" "$APP/Contents/Info.plist"
+else
+    # Can't produce a macOS Mach-O on Linux. Leave the skeleton's bash launcher in
+    # place; the bundle will NOT launch on macOS 26 until the launcher is compiled
+    # + signed on a Mac (re-run this script there).
+    echo "WARNING: $OS can't compile the macOS launcher — bundle will NOT launch on macOS 26." >&2
+    echo "         Re-run on a Mac to produce Contents/MacOS/Decent." >&2
+fi
 
 # ---------------------------------------------------------------------------
 # 3. Payload — the whole working de1plus minus bloat. Keep live history/, skins,
@@ -125,10 +153,33 @@ else
     echo "WARNING: $HELPER is missing — Bluetooth will NOT work in this build!" >&2
 fi
 
+# ---------------------------------------------------------------------------
+# 5. Sign the launcher + native dylib + helper scripts, then seal the whole
+#    bundle (Developer ID). macOS 26 won't launch an app bundling executable code
+#    unless it carries a valid, consistent signature (unsigned/ad-hoc/mixed =
+#    error -54). No notarization needed: a locally-built, non-quarantined app
+#    launches with a plain Developer-ID signature once it is consistent.
+#    ble_helper keeps its own (non-hardened) Developer-ID signature from step 4.
+# ---------------------------------------------------------------------------
+if [ "$OS" = "Darwin" ]; then
+    echo "Signing launcher + bundle (Developer ID) ..."
+    DYLIB="$RES/ble/lib/libtclble.dylib"
+    [ -f "$DYLIB" ] && codesign --force --timestamp --sign "$SIGN_ID" "$DYLIB"
+    # secondary helper scripts in MacOS/ (not the main exec) so --verify --deep passes
+    for s in "$APP/Contents/MacOS/"*; do
+        case "$s" in */Decent) continue ;; esac
+        [ -f "$s" ] && codesign --force --timestamp --sign "$SIGN_ID" "$s"
+    done
+    codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$APP/Contents/MacOS/Decent"
+    codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$APP"
+    codesign --verify --deep --strict "$APP" && echo "bundle  : Developer-ID signed + verified"
+fi
+
 echo ""
 echo "Done: $APP"
 echo "First launch needs a one-time Bluetooth approval"
 echo "  (a prompt, or System Settings -> Privacy & Security -> Bluetooth -> add Decent.app)."
+echo "Requires the interpreter it execs to be installed: $WISH"
 echo "Headless BLE check:"
-echo "  '$APP/Contents/MacOS/wish' '$RES/de1plus.tcl' --ble-test -sdlheight 801 -sdlwidth 1280 -name BLETEST"
+echo "  '$WISH' '$RES/de1plus.tcl' --ble-test -sdlheight 801 -sdlwidth 1280 -name BLETEST"
 echo "  then read: $RES/log.txt   (lines tagged BLETEST)"
