@@ -7,7 +7,10 @@
 # So a real sync must update BOTH. This does that, then reinstalls + relaunches.
 set -uo pipefail
 
-SRC=/d/admin/code/de1app/de1plus
+# de1app source = the de1plus of the decentespresso/de1app repo this `misc`
+# submodule is embedded in (misc/ios -> ../../de1plus). No duplicate copy: the
+# iOS app bundles a build-time rsync of THIS tree, nothing is forked.
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../de1plus" && pwd)"
 DIST=/Users/john/iwish/dist
 APP="$DIST/IwishDE1dev.app"
 B="$APP/de1plus"
