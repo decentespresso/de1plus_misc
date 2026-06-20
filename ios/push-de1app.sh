@@ -15,7 +15,10 @@ DEV=F8B770E6-60A9-5FCE-9266-D63B7BFB0840
 ID=com.decent.de1app
 CERT=6C05310364D9264A80165D6594CB5CD1E7D6CFB8
 PROFILE="$DIST/de1app.mobileprovision"
-SIGN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/sign-and-install-device.sh"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IWISH="$HERE/iwish"                       # the johnbuckman/iwish submodule (runtime + shared scripts)
+SIGN="$IWISH/scripts/sign-and-install-device.sh"   # generic signer: <app> <id> <profile> <udid> [ent]
+ENT="$HERE/de1app.entitlements"
 
 # skins that are seeded into Decent (only these exist on-device)
 SEEDED_SKINS=(default Insight "Insight Dark" Streamline "Streamline Dark" \
@@ -34,8 +37,8 @@ echo "   bundle tcl files: $(find "$B" -name '*.tcl' | wc -l | tr -d ' ')"
 echo "1b) runtime: ensure the pure-Tcl Unix commands are present (iwish runtime file)"
 # unix-commands.tcl is an iWish-runtime file (ls/cat/cp/...; iOS has no exec). A
 # clean iwish runtime already ships it in lib/tcl8.6 with init.tcl hooked; this
-# self-heals a bundle built before that. Source of truth = the iwish repo.
-UC=/Users/john/iwish-ios/scripts/unix-commands.tcl
+# self-heals a bundle built before that. Source of truth = the iwish submodule.
+UC="$IWISH/scripts/unix-commands.tcl"
 TL="$APP/lib/tcl8.6"
 if [ -f "$UC" ]; then
     cp "$UC" "$TL/unix-commands.tcl" && echo "   lib/tcl8.6/unix-commands.tcl"
@@ -52,7 +55,7 @@ fi
 echo "2) reinstall the bundle"
 xcrun devicectl device process terminate --device "$DEV" "$ID" >/dev/null 2>&1 || true
 xattr -cr "$APP"
-bash "$SIGN" "$CERT" "$PROFILE" "$DEV" 2>&1 \
+bash "$SIGN" "$APP" "$CERT" "$PROFILE" "$DEV" "$ENT" 2>&1 \
     | grep -iE "INSTALLED|FAILED|install failed" | head -1
 
 echo "3) Decent: the [homedir]-read code"

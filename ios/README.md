@@ -20,6 +20,19 @@ developers can use iwish to build and submit their own packaged Tcl/Tk apps.
 
 ## What's here
 
+de1app-on-iOS is **just de1app's Tcl/Tk code riding on the iwish runtime**, so the
+iwish runtime + its shared build/sign/icon scripts are pulled in as a git submodule
+rather than copied here:
+
+- `iwish/` — **git submodule → `johnbuckman/iwish`** (the engine + shared scripts:
+  `scripts/build-device.sh`, `scripts/sign-and-install-device.sh` (generic),
+  `scripts/build-icon.sh` (generic), `scripts/unix-commands.tcl`, the `src-ios`
+  shims, and the androwish/SDL patches). Clone de1app with `--recursive`, or
+  `git submodule update --init --recursive`. **Everything runtime-related lives
+  here, not copied into de1app.**
+
+Genuinely de1app-specific (the only non-submodule files here):
+
 - `launcher.tcl` — the app's `main.tcl` inside the bundle. A thin bootstrap: sets
   `TCL_LIBRARY`/`TK_LIBRARY` + the native-extension `auto_path` (no env on iOS),
   then `cd`s into the bundled `de1plus` and `source`s `de1plus.tcl`.
@@ -27,14 +40,14 @@ developers can use iwish to build and submit their own packaged Tcl/Tk apps.
   hidden status bar, `MinimumOSVersion 15.0`, icon keys (`AppIcon`).
 - `de1app.entitlements` — signing entitlements (app-id `XD9V8H8S2N.com.decent.de1app`,
   get-task-allow, …); must match the provisioning profile's App ID.
-- `build-icon.sh` — build the app icon from a source image (`/d/img/de1plus_white.jpg`)
-  → opaque 1024 → `actool` → `Assets.car` + `AppIcon*.png`.
-- `sign-and-install-device.sh` — sign every nested dylib + the app (with the
-  entitlements + embedded profile) and `devicectl install` to a connected iPad.
+- `build-icon.sh` — **thin wrapper** that calls `iwish/scripts/build-icon.sh` with
+  de1app's icon source (`/d/img/de1plus_white.jpg`). Only the source image is
+  de1app-specific; the pipeline lives in the submodule.
 - `push-de1app.sh` — **dev iteration**: sync the de1app source into a built `.app`
-  and onto the device. de1app reads code from TWO places, so it syncs BOTH:
-  the bundle (cwd — top-level `*.tcl`) and `~/Documents/Decent` (`[homedir]` —
-  skins/plugins/profile_editors/translation), then reinstalls + relaunches.
+  and onto the device, signing via `iwish/scripts/sign-and-install-device.sh`.
+  de1app reads code from TWO places, so it syncs BOTH: the bundle (cwd — top-level
+  `*.tcl`) and `~/Documents/Decent` (`[homedir]` — skins/plugins/profile_editors/
+  translation), then reinstalls + relaunches.
 
 The de1app **source** side of iOS support lives in the normal de1app tree, not
 here: `de1plus/ios.tcl` (platform detection via `borg platform`; redirect the
@@ -43,7 +56,8 @@ hooks in `de1app.tcl`/`main.tcl`/`utils.tcl`/`updater.tcl`.
 
 ## Building de1app-on-iOS (outline)
 
-1. **Build the iwish runtime** for `arm64-apple-ios` (see `johnbuckman/iwish`):
+1. **Build the iwish runtime** for `arm64-apple-ios` via the submodule
+   (`iwish/scripts/build-device.sh` + `iwish/scripts/build-ext-dev.sh`):
    FreeType, SDL2, AndroWish Tcl, sdl2tk + `sdl2wish` (UTF6), plus the loadable
    extension stack (tkimg, tls, TclCurl, BLT, tksvg, sqlite3, itcl, thread, zint)
    and the `borg`/`ble` shims. This yields: the `sdl2wish` binary, `lib/tcl8.6` +
@@ -60,9 +74,9 @@ hooks in `de1app.tcl`/`main.tcl`/`utils.tcl`/`updater.tcl`.
      already ships this; `push-de1app.sh` self-heals it (step 1b) for older bundles.
    - `de1plus/` — a curated copy of the de1app tree (code + active skins/Streamline,
      fonts, splash, etc.; drop builds/history/apk and unused skin resolutions)
-   - `main.tcl` (= `launcher.tcl`), `Info.plist`, the icon (`build-icon.sh`),
-     `embedded.mobileprovision`
-3. **Sign + install:** `sign-and-install-device.sh <identity> <profile> <udid>`.
+   - `main.tcl` (= `launcher.tcl`), `Info.plist`, the icon (`build-icon.sh` →
+     `iwish/scripts/build-icon.sh`), `embedded.mobileprovision`
+3. **Sign + install:** `iwish/scripts/sign-and-install-device.sh <app> <identity> <profile> <udid> [entitlements]`.
    Needs an Apple Development cert + a provisioning profile (device UDID +
    the device UDID) for `com.decent.de1app`. iWish-on-iOS uses a separate id
    (`com.decent.iWish`) so both apps can be installed side by side.
