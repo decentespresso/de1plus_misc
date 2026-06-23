@@ -200,12 +200,15 @@ if [ "${SLIM_DIST:-0}" = "1" ]; then
     # firmware blob (no in-app firmware update in this build)
     rm -f "$RES/fw/bootfwupdate.dat"
 
-    # fonts: keep ONLY what Insight + default need -- Latin UI + Font Awesome icons.
-    # Drops the language packs (CJK ~32 MB, Hebrew, Thai, Arabic/Dubai) and the
-    # non-manifest extras. NOTE: this means non-Latin UI languages won't render.
+    # fonts: keep ONLY what Insight + default need -- Latin UI + Font Awesome icons
+    # + NotoSansCJKjp-Regular (the named 'global_font' used for listboxes/menus in
+    # the default theme; dui.tcl sets global_font_name to it). Drops the CJK Bold
+    # (zh/kr only), Hebrew, Thai, Arabic/Dubai and the non-manifest extras. NOTE:
+    # non-Latin UI languages still won't fully render.
     if [ -d "$RES/fonts" ]; then
         keep_fonts=(
-            "notosansuiregular.ttf" "notosansuibold.ttf"
+            "notosansuiregular.ttf" "notosansuibold.ttf" "NotoSansCJKjp-Regular.otf"
+            "Roboto-Regular.ttf"
             "Font Awesome 5 Brands-Regular-400.otf" "Font Awesome 5 Duotone-Solid-900.otf"
             "Font Awesome 5 Pro-Light-300.otf" "Font Awesome 5 Pro-Regular-400.otf"
             "Font Awesome 5 Pro-Solid-900.otf" "Font Awesome 6 Brands-Regular-400.otf"
@@ -220,10 +223,22 @@ if [ "${SLIM_DIST:-0}" = "1" ]; then
     fi
 
     # directories that must ship EMPTY (keep the dir, drop the contents)
-    for d in plugins godshots history wallpaper; do
+    for d in godshots history wallpaper; do
         if [ -d "$RES/$d" ]; then rm -rf "$RES/$d"; fi
         mkdir -p "$RES/$d"
     done
+
+    # plugins: keep only PLUGIN_WHITELIST (unset/empty => ship none). The default-
+    # enabled plugins missing from disk are skipped harmlessly by plugins.tcl.
+    if [ -d "$RES/plugins" ]; then
+        for d in "$RES/plugins"/*/; do
+            [ -d "$d" ] || continue
+            name="$(basename "$d")"
+            keep=0; for k in ${PLUGIN_WHITELIST:-}; do if [ "$name" = "$k" ]; then keep=1; fi; done
+            if [ "$keep" = 0 ]; then rm -rf "$d"; fi
+        done
+    fi
+    mkdir -p "$RES/plugins"
 
     # directories / files to drop entirely
     for d in doc bin steamprofiles certs traces simulations; do
@@ -235,6 +250,10 @@ if [ "${SLIM_DIST:-0}" = "1" ]; then
     rm -f "$APP/Contents/Resources/de1plus.tiff" \
           "$APP/Contents/Resources/undroidwish.tiff" \
           "$APP/Contents/Resources/undroidwish.icns"
+
+    # mark this as the ultra-minimal build so de1app shows the self-update-to-full
+    # message on first run instead of the version/changelog page (gui.tcl).
+    : > "$RES/ultra_minimal.flag"
 fi
 
 # COPY_TO_DOCS=1: drop the standalone marker so osx.tcl copies the bundle to a
