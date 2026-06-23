@@ -92,7 +92,23 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 #     another bundle. So the .app depends on that interpreter being installed
 #     (same as unde1plus.sh / unde1plus-arm64.sh).
 # ---------------------------------------------------------------------------
-printf '%s\n' "$WISH" > "$APP/Contents/Resources/interp"
+# BUNDLE_INTERP=1: copy the interpreter INTO the bundle and exec it via a path
+# relative to Contents (the launcher chdirs to Contents first), so the .app is
+# self-contained and needs nothing installed on the user's machine. The arm64
+# undroidwish is a single batteries-included binary, so one file is the whole
+# runtime; it is re-signed with our Developer ID in the signing step below.
+# Re-signing the COPY strips the original notarization, so macOS 26 treats it as
+# our own nested binary rather than a re-hosted notarized one (the concern noted
+# above) -- a re-signed copy runs fine. Default keeps exec'ing the external one.
+INTERP_BASENAME="$(basename "$WISH")"
+if [ "${BUNDLE_INTERP:-0}" = "1" ]; then
+    echo "Bundling interpreter : $INTERP_BASENAME (self-contained .app)"
+    cp -f "$WISH" "$APP/Contents/Resources/$INTERP_BASENAME"
+    chmod +x "$APP/Contents/Resources/$INTERP_BASENAME"
+    printf '%s\n' "Resources/$INTERP_BASENAME" > "$APP/Contents/Resources/interp"
+else
+    printf '%s\n' "$WISH" > "$APP/Contents/Resources/interp"
+fi
 if [ "$OS" = "Darwin" ]; then
     [ -f "$LAUNCHER_SRC" ] || { echo "ERROR: launcher source not found: $LAUNCHER_SRC" >&2; exit 1; }
     echo "Compiling Mach-O launcher ..."
@@ -121,6 +137,114 @@ rsync -aL --delete \
     --exclude 'CVS' --exclude '.git' --exclude '.gitignore' \
     --exclude 'log.txt' --exclude 'log.txt.*' \
     "$SRC/" "$RES/"
+
+# ---------------------------------------------------------------------------
+# 3b. Slim the payload (optional). The dev working tree carries 50+ skins at 5
+#     resolutions each (~1 GB). For a distributable build, ship only the skins and
+#     resolutions you need; runtime resize regenerates any other resolution into
+#     the writable data dir on demand (dui find / image_cache_dir_for).
+#       SKIN_WHITELIST="Insight default"        -> keep only these skin dirs
+#       RES_WHITELIST="2560x1600 1280x800"      -> keep only these WxH dirs
+#                                                  (under skins/, splash/, saver/)
+# ---------------------------------------------------------------------------
+if [ -n "${SKIN_WHITELIST:-}" ] && [ -d "$RES/skins" ]; then
+    echo "Pruning skins to: $SKIN_WHITELIST"
+    for d in "$RES/skins"/*/; do
+        name="$(basename "$d")"
+        keep=0; for k in $SKIN_WHITELIST; do if [ "$name" = "$k" ]; then keep=1; fi; done
+        if [ "$keep" = 0 ]; then rm -rf "$d"; fi
+    done
+fi
+if [ -n "${RES_WHITELIST:-}" ]; then
+    echo "Pruning resolutions to: $RES_WHITELIST"
+    for base in skins splash saver; do
+        [ -d "$RES/$base" ] || continue
+        while IFS= read -r rd; do
+            name="$(basename "$rd")"
+            keep=0; for r in $RES_WHITELIST; do if [ "$name" = "$r" ]; then keep=1; fi; done
+            if [ "$keep" = 0 ]; then rm -rf "$rd"; fi
+        done < <(find "$RES/$base" -type d -regex '.*/[0-9][0-9]*x[0-9][0-9]*')
+    done
+fi
+
+# ---------------------------------------------------------------------------
+# 3c. SLIM_DIST=1: aggressive distributable trim -- strip everything not needed
+#     to RUN the Insight + default skins. Each rule is set -e-safe.
+# ---------------------------------------------------------------------------
+if [ "${SLIM_DIST:-0}" = "1" ]; then
+    echo "Slim-dist trim ..."
+
+    # splash: drop the 'unused' staging dir (if any)
+    rm -rf "$RES/splash/unused"
+
+    # saver: drop downloaded/, and keep ONLY splash_noir.jpg in the kept resolutions
+    rm -rf "$RES/saver/downloaded"
+    for r in 1280x800 2560x1600; do
+        d="$RES/saver/$r"
+        if [ -f "$d/splash_noir.jpg" ]; then
+            mv "$d/splash_noir.jpg" "$d/.keep_splash_noir"
+            find "$d" -mindepth 1 ! -name '.keep_splash_noir' -exec rm -rf {} + 2>/dev/null || true
+            mv "$d/.keep_splash_noir" "$d/splash_noir.jpg"
+        fi
+    done
+
+    # ble/: keep ONLY the runtime essentials (package + helper + dylib)
+    if [ -d "$RES/ble" ]; then
+        find "$RES/ble" -mindepth 1 -maxdepth 1 \
+            ! -name ble.tcl ! -name pkgIndex.tcl ! -name bin ! -name lib \
+            -exec rm -rf {} + 2>/dev/null || true
+        find "$RES/ble/bin" -mindepth 1 ! -name ble_helper.bin -exec rm -rf {} + 2>/dev/null || true
+        find "$RES/ble/lib" -mindepth 1 ! -name libtclble.dylib -exec rm -rf {} + 2>/dev/null || true
+    fi
+
+    # firmware blob (no in-app firmware update in this build)
+    rm -f "$RES/fw/bootfwupdate.dat"
+
+    # fonts: keep ONLY what Insight + default need -- Latin UI + Font Awesome icons.
+    # Drops the language packs (CJK ~32 MB, Hebrew, Thai, Arabic/Dubai) and the
+    # non-manifest extras. NOTE: this means non-Latin UI languages won't render.
+    if [ -d "$RES/fonts" ]; then
+        keep_fonts=(
+            "notosansuiregular.ttf" "notosansuibold.ttf"
+            "Font Awesome 5 Brands-Regular-400.otf" "Font Awesome 5 Duotone-Solid-900.otf"
+            "Font Awesome 5 Pro-Light-300.otf" "Font Awesome 5 Pro-Regular-400.otf"
+            "Font Awesome 5 Pro-Solid-900.otf" "Font Awesome 6 Brands-Regular-400.otf"
+            "Font Awesome 6 Pro-Regular-400.otf"
+        )
+        for f in "$RES/fonts"/*; do
+            [ -e "$f" ] || continue
+            b="$(basename "$f")"; skip=0
+            for k in "${keep_fonts[@]}"; do if [ "$b" = "$k" ]; then skip=1; fi; done
+            if [ "$skip" = 0 ]; then rm -rf "$f"; fi
+        done
+    fi
+
+    # directories that must ship EMPTY (keep the dir, drop the contents)
+    for d in plugins godshots history wallpaper; do
+        if [ -d "$RES/$d" ]; then rm -rf "$RES/$d"; fi
+        mkdir -p "$RES/$d"
+    done
+
+    # directories / files to drop entirely
+    for d in doc bin steamprofiles certs traces simulations; do
+        rm -rf "$RES/$d"
+    done
+    rm -f "$RES/shothistory.zip"
+
+    # bundle icons: Info.plist uses de1plus.icns -- keep it, drop the unused ones
+    rm -f "$APP/Contents/Resources/de1plus.tiff" \
+          "$APP/Contents/Resources/undroidwish.tiff" \
+          "$APP/Contents/Resources/undroidwish.icns"
+fi
+
+# COPY_TO_DOCS=1: drop the standalone marker so osx.tcl copies the bundle to a
+# writable ~/Documents/de1app on first launch and runs from there (no self-update;
+# the whole tree is already present). Without it the app runs in place from the
+# (signed, ideally immutable) bundle.
+if [ "${COPY_TO_DOCS:-0}" = "1" ]; then
+    echo "Dropping standalone.flag (first launch copies to ~/Documents/de1app)"
+    : > "$RES/standalone.flag"
+fi
 
 # ---------------------------------------------------------------------------
 # 4. Bluetooth — make sure the helper is Developer-ID signed (stable TCC identity).
@@ -165,6 +289,14 @@ if [ "$OS" = "Darwin" ]; then
     echo "Signing launcher + bundle (Developer ID) ..."
     DYLIB="$RES/ble/lib/libtclble.dylib"
     [ -f "$DYLIB" ] && codesign --force --timestamp --sign "$SIGN_ID" "$DYLIB"
+    # bundled interpreter (BUNDLE_INTERP=1): re-sign the COPY with our Developer ID
+    # (plain, no hardened runtime -- it dlopen's Tcl/Tk from its own __zipfs and the
+    # app can't be notarized anyway) so the nested binary is consistent with the
+    # bundle seal and --verify --deep passes.
+    if [ "${BUNDLE_INTERP:-0}" = "1" ] && [ -f "$APP/Contents/Resources/$INTERP_BASENAME" ]; then
+        echo "interpreter : re-signing bundled $INTERP_BASENAME ..."
+        codesign --force --timestamp --sign "$SIGN_ID" "$APP/Contents/Resources/$INTERP_BASENAME"
+    fi
     # secondary helper scripts in MacOS/ (not the main exec) so --verify --deep passes
     for s in "$APP/Contents/MacOS/"*; do
         case "$s" in */Decent) continue ;; esac
@@ -179,7 +311,15 @@ echo ""
 echo "Done: $APP"
 echo "First launch needs a one-time Bluetooth approval"
 echo "  (a prompt, or System Settings -> Privacy & Security -> Bluetooth -> add Decent.app)."
-echo "Requires the interpreter it execs to be installed: $WISH"
+if [ "${BUNDLE_INTERP:-0}" = "1" ]; then
+    echo "Self-contained: interpreter bundled at Contents/Resources/$INTERP_BASENAME (nothing to install)."
+else
+    echo "Requires the interpreter it execs to be installed: $WISH"
+fi
+if [ "${COPY_TO_DOCS:-0}" = "1" ]; then
+    echo "First launch copies the app to ~/Documents/de1app and runs from there."
+    echo "  (To pick up a NEW build, remove ~/Documents/de1app first so it re-copies.)"
+fi
 echo "Headless BLE check:"
 echo "  '$WISH' '$RES/de1plus.tcl' --ble-test -sdlheight 801 -sdlwidth 1280 -name BLETEST"
 echo "  then read: $RES/log.txt   (lines tagged BLETEST)"
