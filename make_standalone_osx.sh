@@ -265,6 +265,13 @@ if [ "${COPY_TO_DOCS:-0}" = "1" ]; then
     : > "$RES/standalone.flag"
 fi
 
+# Stamp this build with a unique id. osx.tcl compares the bundle's build_id to the
+# ~/Documents/de1app copy's; when they differ (i.e. a freshly-built bundle was run)
+# it refreshes the CODE in the copy so rebuilds actually take effect, instead of
+# the copy staying frozen at whatever first dropped the .complete marker. Written
+# before codesign so it is inside the sealed bundle.
+printf '%s-%s\n' "$(date +%s)" "$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo nogit)" > "$RES/build_id.txt"
+
 # ---------------------------------------------------------------------------
 # 4. Bluetooth — make sure the helper is Developer-ID signed (stable TCC identity).
 #    The committed helper is already signed and rsync -a preserves it; we only
