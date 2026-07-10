@@ -45,7 +45,7 @@ android {
         applicationId "com.decentespresso.de1app"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 11
+        versionCode 12
         versionName "1.0"
     }
 

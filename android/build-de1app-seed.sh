@@ -10,16 +10,16 @@ DST="${DST:-$HOME/de1app-android}"
 APPDIR="$DST/assets/app"
 SEED="$APPDIR/de1plus"
 
-# POPULAR-SKINS seed (John 2026-07-10): ship only the "most popular skins"
+# POPULAR-SKINS seed (John 2026-07-10): ship the "most popular skins"
 # (machine.tcl:439 most_popular_skins = Insight MimojaCafe Metric DSx SWDark4 DSx2
-# MiniMetric) + the "default" fallback image dir (dui uses it, dui.tcl:362), at the
-# 2560x1600 rescale base only (dui rescales to any display), plus ALL fonts -- so the
-# common skins work fully OFFLINE with no first-run download. All other (decorative)
-# skins self-update on demand when picked. Keep this list in sync with machine.tcl:439.
+# MiniMetric) + "Streamline Dark" (John's addition) + the "default" fallback image
+# dir (dui uses it, dui.tcl:362), at the 2560x1600 rescale base only (dui rescales to
+# any display), plus ALL fonts -- so the common skins work fully OFFLINE with no
+# first-run download. All other (decorative) skins self-update on demand when picked.
 #   SEED_SKINS=ALL      -> keep every skin (else a |-list of skin names)
 #   SEED_SKIN_RES       -> |-list of resolution subdirs to keep
 #   SEED_FONTS=ALL      -> keep every font (else a |-list of font filenames)
-SEED_SKINS="${SEED_SKINS:-default|Insight|MimojaCafe|Metric|DSx|SWDark4|DSx2|MiniMetric}"
+SEED_SKINS="${SEED_SKINS:-default|Insight|MimojaCafe|Metric|DSx|SWDark4|DSx2|MiniMetric|Streamline Dark}"
 SEED_SKIN_RES="${SEED_SKIN_RES:-2560x1600}"
 SEED_FONTS="${SEED_FONTS:-ALL}"
 
