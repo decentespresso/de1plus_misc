@@ -1,0 +1,17 @@
+diff --git a/src/tk/tcl/wish/AndroWish.java b/src/tk/tcl/wish/AndroWish.java
+index 37d642f2..90a2d3f2 100644
+--- a/src/tk/tcl/wish/AndroWish.java
++++ b/src/tk/tcl/wish/AndroWish.java
+@@ -38,9 +38,9 @@ import android.net.*;
+ import android.util.*;
+ import android.bluetooth.*;
+ import android.widget.*;
+-import android.support.v4.app.NotificationCompat;
+-import android.support.v4.app.ActivityCompat;
+-import android.support.v4.content.ContextCompat;
++import androidx.core.app.NotificationCompat;
++import androidx.core.app.ActivityCompat;
++import androidx.core.content.ContextCompat;
+ import android.hardware.*;
+ import android.hardware.usb.*;
+ import android.telephony.*;

@@ -1,0 +1,16 @@
+diff --git a/jni/tcl/generic/zipfs.c b/jni/tcl/generic/zipfs.c
+index 6d839cbe..013589b6 100644
+--- a/jni/tcl/generic/zipfs.c
++++ b/jni/tcl/generic/zipfs.c
+@@ -353,9 +353,9 @@ static struct {
+     Tcl_HashTable dirHash;	/* Like fileHash but directories only */
+ } ZipFS = {
+ #ifndef HAVE_PTHREAD_RWLOCK
+-    0, 0, 0, NULL, 128 * 1024 * 1024, 0, 0, NULL,
++    0, 0, 0, NULL, 1536 * 1024 * 1024, 0, 0, NULL,
+ #else
+-    0, NULL, 128 * 1024 * 1024, 0, 0, NULL,
++    0, NULL, 1536 * 1024 * 1024, 0, 0, NULL,
+ #endif
+ };
+ 

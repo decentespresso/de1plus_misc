@@ -1,0 +1,11 @@
+diff --git a/jni/Application64.mk b/jni/Application64.mk
+index 21c5fb93..385b2149 100644
+--- a/jni/Application64.mk
++++ b/jni/Application64.mk
+@@ -12,5 +12,5 @@ APP_PLATFORM := android-23
+ # or "APP_ABI := armeabi arm64-v8a"   for almost all ARM
+ # or "APP_ABI := x86 x86_64"          for all Intel
+ 
+-APP_ABI := arm64-v8a x86_64
++APP_ABI := arm64-v8a
+ APP_ALLOW_MISSING_DEPS := true

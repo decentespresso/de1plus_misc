@@ -1,0 +1,204 @@
+/*
+ * AndroWish gradle.build file modeled after custom_rules.xml for
+ * setup/cleanup of the source tree and to run the NDK build tool
+ * on the native components.
+ *
+ *    ./gradlew help                   some info
+ *    ./gradlew assembleDebug          build debug APK
+ *    ./gradlew assembleRelease        build release APK
+ *    ./gradlew clean                  clean tree
+ *
+ * Output goes into build/outputs/apk e.g. as AndroWish-debug.apk
+ */
+
+/*
+ * These are needed since we deal with ndk-build ourselves.
+ */
+//project.gradle.startParameter.excludedTaskNames.add('compileDebugNdk')
+//project.gradle.startParameter.excludedTaskNames.add('compileReleaseNdk')
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+	classpath 'com.android.tools.build:gradle:8.9.1'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    namespace "tk.tcl.wish"
+
+    compileSdkVersion 35		/* must match targetSdkVersion below */
+
+    defaultConfig {
+        applicationId "com.decentespresso.de1app"
+        minSdkVersion 21
+        targetSdkVersion 35
+        versionCode 11
+        versionName "1.0"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest64.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs']
+            jni.srcDirs = []
+        }
+
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+
+    if (new File("ant.properties").exists()) {
+        Properties props = new Properties()
+        props.load(new FileInputStream(file("ant.properties")))
+        // Passwords are NOT stored on disk: they live in the macOS login
+        // keychain (service "androwish-release-keystore", accounts "store" and
+        // "key") and are fetched at build time. Only the non-secret keystore
+        // path + alias remain in ant.properties.
+        def keychainSecret = { acct ->
+            ['security', 'find-generic-password', '-w',
+             '-s', 'androwish-release-keystore', '-a', acct].execute().text.trim()
+        }
+        if (props['key.store'] != null &&
+            new File(props['key.store']).exists()) {
+            signingConfigs {
+                release {
+                    storeFile file(props['key.store'])
+                    storePassword keychainSecret('store')
+                    keyAlias props['key.alias']
+                    keyPassword keychainSecret('key')
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            if (signingConfigs.hasProperty('release')) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    /*
+     * Prepare source tree for ndk-build:
+     *  - copy files for Windows platforms
+     *  - symlink directories for POSIX platforms
+     */
+    preBuild.doLast {
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            println "Copy selected jni sources"
+            ant.copy(todir: "${projectDir}/jni/tcl-pkgs") {
+                fileset(dir: "${projectDir}/jni/tcl/pkgs")
+            }
+            ant.copy(todir: "${projectDir}/assets/tcl8.6") {
+                fileset(dir: "${projectDir}/jni/tcl/library")
+            }
+            ant.copy(todir: "${projectDir}/assets/sdl2tk8.6") {
+                fileset(dir: "${projectDir}/jni/sdl2tk/library")
+            }
+        } else {
+            println "(Re)create symlinks"
+            file("jni/tcl-pkgs").delete()
+            file("jni/tcl/tcl").delete()
+            file("assets/tcl8.6").delete()
+            file("assets/sdl2tk8.6").delete()
+            ant.symlink(resource: "${projectDir}/jni/tcl/pkgs", link: "jni/tcl-pkgs", overwrite: true)
+            ant.symlink(resource: ".", link: "jni/tcl/tcl", overwrite: true)
+            ant.symlink(resource: "${projectDir}/jni/tcl/library", link: "assets/tcl8.6", overwrite: true)
+            ant.symlink(resource: "${projectDir}/jni/sdl2tk/library", link: "assets/sdl2tk8.6", overwrite: true)
+        }
+    }
+
+    /*
+     * Cleanup ${projectDir}/jni
+     */
+    clean.doLast {
+        println "Cleaning up (runs 'ndk-build clean' etc.)"
+        def ndkDir = System.getenv('ANDROID_NDK_HOME')
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            def ndkBuild = (ndkDir == null) ? "ndk-build.cmd" : "${ndkDir}/ndk-build.com"
+            exec {
+                workingDir "${projectDir}/jni"
+                commandLine "${ndkBuild}"
+                args "-k", "clean", "NDK_APPLICATION_MK=Application64.mk"
+            }
+            file("jni/tcl-pkgs").deleteDir()
+            file("assets/tcl8.6").deleteDir()
+            file("assets/sdl2tk8.6").deleteDir()
+        } else {
+            def ndkBuild = (ndkDir == null) ? "ndk-build" : "${ndkDir}/ndk-build"
+            exec {
+                workingDir "${projectDir}/jni"
+                commandLine "${ndkBuild}"
+                args "-k", "clean", "NDK_APPLICATION_MK=Application64.mk"
+            }
+            file("jni/tcl-pkgs").delete()
+            file("jni/tcl/tcl").delete()
+            file("assets/tcl8.6").delete()
+            file("assets/sdl2tk8.6").delete()
+        }
+    }
+
+    /*
+     * Invoke ndk-build in ${projectDir}/jni
+     */
+    preBuild.doLast {
+        println "Perform ndk-build"
+        def ndkDir = System.getenv('ANDROID_NDK_HOME')
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            def ndkBuild = (ndkDir == null) ? "ndk-build.cmd" : "${ndkDir}/ndk-build.com"
+            exec {
+                workingDir "${projectDir}/jni"
+                commandLine "${ndkBuild}"
+                args "NDK_APPLICATION_MK=Application64.mk"
+            }
+        } else {
+            def ndkBuild = (ndkDir == null) ? "ndk-build" : "${ndkDir}/ndk-build"
+            exec {
+                workingDir "${projectDir}/jni"
+                commandLine "${ndkBuild}"
+                args "NDK_APPLICATION_MK=Application64.mk"
+            }
+        }
+        ant.move(failonerror: false, file: "libs/armeabi/run", tofile: "libs/armeabi/librun.so")
+        ant.move(failonerror: false, file: "libs/x86/run", tofile: "libs/x86/librun.so")
+        ant.move(failonerror: false, file: "libs/armeabi-v7a/run", tofile: "libs/armeabi-v7a/librun.so")
+        ant.move(failonerror: false, file: "libs/arm64-v8a/run", tofile: "libs/arm64-v8a/librun.so")
+        ant.move(failonerror: false, file: "libs/x86_64/run", tofile: "libs/x86_64/librun.so")
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'], exclude: 'android-support-v4.jar')
+    implementation "androidx.core:core:1.13.1"
+}
+

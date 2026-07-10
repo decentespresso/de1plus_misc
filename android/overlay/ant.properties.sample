@@ -1,0 +1,8 @@
+# Non-secret signing config. Passwords are NOT here: they live in the macOS
+# login keychain (service "androwish-release-keystore", accounts "store"/"key")
+# and build.gradle fetches them at build time via /usr/bin/security.
+# Seed them once with:
+#   security add-generic-password -a store -s androwish-release-keystore -w '<pw>' -U
+#   security add-generic-password -a key   -s androwish-release-keystore -w '<pw>' -U
+key.store=/path/to/your/androwish-release.jks
+key.alias=androwish

@@ -1,0 +1,241 @@
+diff --git a/jni/sdl2tk/sdl/SdlTkGfx.c b/jni/sdl2tk/sdl/SdlTkGfx.c
+index e43c9b64..6cc9a52f 100644
+--- a/jni/sdl2tk/sdl/SdlTkGfx.c
++++ b/jni/sdl2tk/sdl/SdlTkGfx.c
+@@ -3,6 +3,19 @@
+ #include "SdlTkInt.h"
+ #include "Xregion.h"
+ 
++/*
++ * Temporary A/B measurement scaffolding for the Android dirty-rectangle
++ * texture-upload optimization.  Define to enable per-frame upload logging
++ * (logcat tag "DRTY") and a runtime flag (DIRTYRECT_BBOX.flag in the de1app
++ * data dir) that forces the original bounding-box upload for comparison.
++ * Uncomment for an A/B measurement build (the per-rect upload stays either way;
++ * this only adds the logging + the baseline-forcing flag). The debug build also
++ * times RenderCopy vs SwapWindow separately and logs the renderer/vsync state;
++ * that measurement showed the GLES2 present is vsync-off (swap_interval=0) and
++ * costs ~1.5ms/frame, i.e. NOT a bottleneck -- so no present-side change is made.
++ */
++/* #define DIRTYRECT_DEBUG 1 */
++
+ /*
+  * Information for software cursor.
+  *
+@@ -703,12 +716,32 @@ SdlTkGfxExposeRegion(Window w, Region dirtyRgn)
+     return dirtyRgn->numRects;
+ }
+ 
+-void
+-SdlTkGfxUpdateRegion(SDL_Renderer *rend, SDL_Texture *tex,
+-		     SDL_Surface *surf, Region rgn)
+-{
+ #ifdef ANDROID
+-    BoxPtr box = &((REGION *) rgn)->extents;
++/*
++ * Dirty-rectangle texture upload (Android).
++ *
++ * On Android the present below must re-blit the whole texture every frame
++ * (SDL_RenderCopy over the viewport + SDL_GL_SwapWindow), because GL double
++ * buffering does not preserve the back buffer.  But the CPU->GPU upload itself
++ * (SDL_UpdateTexture -> glTexSubImage2D, plus a per-row repack on GLES2) only
++ * needs to cover the pixels that actually changed.  The original code uploaded
++ * the bounding box (extents) of the entire update region; for de1app's espresso
++ * screen, where a chart near the top and numeric readouts near the bottom both
++ * change each tick, that bounding box is nearly the whole 800x1280 surface, so
++ * every frame effectively uploaded the full surface.  Uploading the individual
++ * region rectangles instead cuts the byte count to the real changed area.
++ *
++ * The single-box (extents) path is kept when it is cheaper: a one-rect region,
++ * a region fragmented into many rects (per-call overhead would dominate), or a
++ * region whose rects already densely fill their bounding box.
++ */
++
++#define SDLTK_DIRTY_MAX_RECTS 24    /* above this, one bbox upload is cheaper */
++#define SDLTK_DIRTY_DENSE_PCT 75    /* rects fill >= this% of bbox -> use bbox */
++
++static void
++SdlTkUploadBox(SDL_Texture *tex, SDL_Surface *surf, BoxPtr box)
++{
+     SDL_Rect rect[1];
+     void *src;
+ 
+@@ -734,6 +767,157 @@ SdlTkGfxUpdateRegion(SDL_Renderer *rend, SDL_Texture *tex,
+ 		       rect[0].x * surf->format->BytesPerPixel);
+ 	SDL_UpdateTexture(tex, rect, src, surf->pitch);
+     }
++}
++
++#ifdef DIRTYRECT_DEBUG
++#include <android/log.h>
++#include <sys/stat.h>
++#include <stdlib.h>
++#include <stdio.h>
++
++/* Runtime A/B switch: presence of DIRTYRECT_BBOX.flag forces the original
++ * bounding-box upload, so baseline and optimized can be compared from the same
++ * binary.  Re-checked once every 128 frames (cached) so it costs ~nothing. */
++static int
++SdlTkDirtyForceBbox(void)
++{
++    static int cached = 0;
++    static unsigned int counter = 0;
++
++    if ((counter++ & 127) == 0) {
++	struct stat st;
++	const char *home = getenv("HOME");
++	char path[512];
++
++	cached = 0;
++	if (home != NULL) {
++	    snprintf(path, sizeof (path),
++		     "%s/Documents/de1app/DIRTYRECT_BBOX.flag", home);
++	    if (stat(path, &st) == 0) {
++		cached = 1;
++	    }
++	}
++	if (!cached &&
++	    stat("/data/data/com.decentespresso.de1app/files/Documents/"
++		 "de1app/DIRTYRECT_BBOX.flag", &st) == 0) {
++	    cached = 1;
++	}
++    }
++    return cached;
++}
++
++/* 64-frame accumulators for the upload/copy/present timing report. */
++static double sdltk_dbg_up = 0.0, sdltk_dbg_copy = 0.0, sdltk_dbg_pres = 0.0;
++static long sdltk_dbg_bbox = 0, sdltk_dbg_sum = 0, sdltk_dbg_nr = 0;
++static int sdltk_dbg_last_bbox = 0;
++
++static void
++SdlTkDirtyAccum(REGION *reg, int use_bbox, double up_ms)
++{
++    BoxPtr ext = &reg->extents;
++    long bbox_area = (long) (ext->x2 - ext->x1) * (ext->y2 - ext->y1);
++    long sum_area = 0;
++    long i;
++
++    for (i = 0; i < reg->numRects; i++) {
++	BoxPtr b = &reg->rects[i];
++	sum_area += (long) (b->x2 - b->x1) * (b->y2 - b->y1);
++    }
++    sdltk_dbg_up += up_ms;
++    sdltk_dbg_bbox += bbox_area;
++    sdltk_dbg_sum += sum_area;
++    sdltk_dbg_nr += reg->numRects;
++    sdltk_dbg_last_bbox = use_bbox;
++}
++
++/* Called once per present (after the swap) with the measured RenderCopy and
++ * RenderPresent(swap) times.  Emits a 64-frame mean line so we can see whether
++ * the present cost is GPU fill (copy) or the vsync block (present). */
++static void
++SdlTkDirtyEmit(double copy_ms, double present_ms)
++{
++    static unsigned int fc = 0;
++    static int logged_info = 0;
++
++    if (!logged_info) {
++	SDL_RendererInfo info;
++
++	logged_info = 1;
++	if (SDL_GetRendererInfo(SdlTkX.sdlrend, &info) == 0) {
++	    __android_log_print(ANDROID_LOG_ERROR, "DRTY",
++		"renderer=%s vsync_flag=%d swap_interval=%d maxtex=%dx%d",
++		info.name,
++		(info.flags & SDL_RENDERER_PRESENTVSYNC) ? 1 : 0,
++		SDL_GL_GetSwapInterval(),
++		info.max_texture_width, info.max_texture_height);
++	}
++    }
++    sdltk_dbg_copy += copy_ms;
++    sdltk_dbg_pres += present_ms;
++    if ((++fc % 64) != 0) {
++	return;
++    }
++    __android_log_print(ANDROID_LOG_ERROR, "DRTY",
++	"64f avg: nr=%.1f bbox=%ld sum=%ld fill=%ld%% upload=%.2f copy=%.2f present=%.2f ms last=%s",
++	sdltk_dbg_nr / 64.0, sdltk_dbg_bbox / 64, sdltk_dbg_sum / 64,
++	sdltk_dbg_bbox > 0 ? (sdltk_dbg_sum * 100 / sdltk_dbg_bbox) : 0L,
++	sdltk_dbg_up / 64.0, sdltk_dbg_copy / 64.0, sdltk_dbg_pres / 64.0,
++	sdltk_dbg_last_bbox ? "bbox" : "rects");
++    sdltk_dbg_up = sdltk_dbg_copy = sdltk_dbg_pres = 0.0;
++    sdltk_dbg_bbox = sdltk_dbg_sum = sdltk_dbg_nr = 0;
++}
++#endif /* DIRTYRECT_DEBUG */
++#endif /* ANDROID */
++
++void
++SdlTkGfxUpdateRegion(SDL_Renderer *rend, SDL_Texture *tex,
++		     SDL_Surface *surf, Region rgn)
++{
++#ifdef ANDROID
++    {
++	REGION *reg = (REGION *) rgn;
++	long nr = reg->numRects;
++	int use_bbox;
++	long i;
++
++	if (nr <= 1 || nr > SDLTK_DIRTY_MAX_RECTS) {
++	    use_bbox = 1;
++	} else {
++	    BoxPtr ext = &reg->extents;
++	    long bbox_area = (long) (ext->x2 - ext->x1) * (ext->y2 - ext->y1);
++	    long sum_area = 0;
++
++	    for (i = 0; i < nr; i++) {
++		BoxPtr b = &reg->rects[i];
++		sum_area += (long) (b->x2 - b->x1) * (b->y2 - b->y1);
++	    }
++	    use_bbox = (bbox_area <= 0) ||
++		       (sum_area * 100 >= bbox_area * SDLTK_DIRTY_DENSE_PCT);
++	}
++#ifdef DIRTYRECT_DEBUG
++	if (SdlTkDirtyForceBbox()) {
++	    use_bbox = 1;
++	}
++	{
++	    Uint64 _t0 = SDL_GetPerformanceCounter();
++#endif
++	if (use_bbox) {
++	    SdlTkUploadBox(tex, surf, &reg->extents);
++	} else {
++	    for (i = 0; i < nr; i++) {
++		SdlTkUploadBox(tex, surf, &reg->rects[i]);
++	    }
++	}
++#ifdef DIRTYRECT_DEBUG
++	    SdlTkDirtyAccum(reg, use_bbox,
++		(double) (SDL_GetPerformanceCounter() - _t0) * 1000.0 /
++		(double) SDL_GetPerformanceFrequency());
++	}
++#endif
++    }
++#ifdef DIRTYRECT_DEBUG
++    Uint64 _tcopy0 = SDL_GetPerformanceCounter();
++#endif
+     if (SdlTkX.draw_later & SDLTKX_RENDCLR2) {
+ 	SdlTkX.draw_later &= ~SDLTKX_RENDCLR2;
+ 	SDL_SetRenderDrawColor(SdlTkX.sdlrend, 0, 0, 0, 255);
+@@ -881,7 +1065,20 @@ SdlTkGfxUpdateRegion(SDL_Renderer *rend, SDL_Texture *tex,
+     } else {
+ 	SDL_RenderCopy(rend, tex, &SdlTkX.viewport, SdlTkX.outrect);
+     }
++#ifdef DIRTYRECT_DEBUG
++    {
++	double _freq = (double) SDL_GetPerformanceFrequency();
++	Uint64 _tc = SDL_GetPerformanceCounter();
++	Uint64 _td;
++
++	SDL_RenderPresent(rend);
++	_td = SDL_GetPerformanceCounter();
++	SdlTkDirtyEmit((double) (_tc - _tcopy0) * 1000.0 / _freq,
++		       (double) (_td - _tc) * 1000.0 / _freq);
++    }
++#else
+     SDL_RenderPresent(rend);
++#endif
+ #else
+     long i;
+     int count = 0;
