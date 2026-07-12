@@ -261,7 +261,7 @@ fi
 # the whole tree is already present). Without it the app runs in place from the
 # (signed, ideally immutable) bundle.
 if [ "${COPY_TO_DOCS:-0}" = "1" ]; then
-    echo "Dropping standalone.flag (first launch copies to ~/Documents/de1app)"
+    echo "Dropping standalone.flag (first launch copies to ~/Documents/Decent)"
     : > "$RES/standalone.flag"
 fi
 
