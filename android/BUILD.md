@@ -64,7 +64,22 @@ python3 "$M"/make-icon.py /d/img/de1plus_white.jpg res
 # 6) build the signed release APK (arm64-only)
 ./gradlew --no-daemon assembleRelease
 #   -> build/outputs/apk/release/AndroWish-release.apk  (~125 MB, "Decent")
+
+# 7) publish to the single rolling "latest" GitHub release, AS de1app.apk, so the
+#    website's stable download link keeps working:
+#      https://github.com/decentespresso/de1app/releases/latest/download/de1app.apk
+cp build/outputs/apk/release/AndroWish-release.apk de1app.apk
+sh "$M"/../publish-latest.sh de1app.apk
 ```
+
+## Publishing
+
+Every platform (Android APK, Linux AppImages, ...) uploads its current build into
+ONE rolling GitHub release (`decentespresso/de1app`, tag `latest`, marked "Latest")
+via `misc/publish-latest.sh`, each with a STABLE filename. The website links
+straight at `…/releases/latest/download/<file>`, which always serves the newest
+build — so those URLs never change. Do NOT go back to per-platform
+`android-latest` / `linux-latest` tags.
 
 ## Signing (keychain, no secrets on disk)
 `build.gradle` reads the keystore password at build time from the macOS login

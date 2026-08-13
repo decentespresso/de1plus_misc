@@ -1,0 +1,38 @@
+#!/bin/sh
+# AppRun -- Decent Espresso (de1app) AppImage entry point.
+#
+# The AppImage payload is a READ-ONLY squashfs mount. de1app writes into its own
+# tree (settings.tdb, history/, profiles, log.txt, and in-app self-update), which
+# a read-only mount can't allow. So we seed the tree into a writable per-user
+# directory (~/.local/share/Decent) on first run, and on a version change refresh
+# the shipped code/assets there while leaving user data in place. Then we launch
+# undroidwish on the writable copy -- the Linux equivalent of the app's own
+# ::de1_redirect_data_root used by the macOS/Android packaged builds.
+set -eu
+
+HERE="$(dirname "$(readlink -f "$0")")"
+PAYLOAD="$HERE/usr/share/decent"                 # read-only: undroidwish + src/
+DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}/Decent"
+UW="$PAYLOAD/undroidwish"
+
+[ -x "$UW" ] || { echo "Decent: bundled undroidwish runtime is missing" >&2; exit 1; }
+[ -f "$PAYLOAD/src/de1plus.tcl" ] || { echo "Decent: bundled app tree is missing" >&2; exit 1; }
+
+mkdir -p "$DATADIR"
+
+# Version marker = the packaged build string. Copy only on first run or upgrade,
+# so normal launches don't re-copy 370MB.
+pv="$(grep -m1 version_string "$PAYLOAD/src/build-info.txt" 2>/dev/null || echo unknown)"
+cv="$(cat "$DATADIR/.decent_appimage_version" 2>/dev/null || echo none)"
+
+if [ ! -f "$DATADIR/.seeded" ] || [ "$pv" != "$cv" ]; then
+    # Overwrite-copy: updates every shipped code/asset file, but never deletes
+    # user-only files that aren't in the payload (settings.tdb, history/, user
+    # profiles) -- so user data survives upgrades.
+    cp -a "$PAYLOAD/src/." "$DATADIR/"
+    printf '%s' "$pv" > "$DATADIR/.decent_appimage_version"
+    : > "$DATADIR/.seeded"
+fi
+
+cd "$DATADIR"
+exec "$UW" de1plus.tcl -sdlwidth 1280 -sdlheight 800 -name "Decent" "$@"

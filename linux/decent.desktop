@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Decent Espresso
+GenericName=Espresso Machine Controller
+Comment=Control and monitor your Decent Espresso DE1 machine
+Exec=AppRun
+Icon=decent
+Categories=Utility;
+Terminal=false
+StartupWMClass=Decent
