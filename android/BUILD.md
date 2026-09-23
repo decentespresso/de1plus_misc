@@ -14,7 +14,7 @@ misc/android/
 ├── README-de1app-apk.md        ← design notes
 ├── overlay/                    ← files copied ONTO a pristine androwish checkout
 │   ├── build.gradle            ← applicationId, SDK 35, androidx, keychain signing
-│   ├── AndroidManifest64.xml   ← 64-bit build manifest (icon → @mipmap/ic_launcher)
+│   ├── AndroidManifest64.xml   ← 64-bit build manifest (icon → @mipmap/ic_launcher, 2 launcher entries)
 │   ├── AndroidManifest.xml     ← 32-bit manifest (kept in sync)
 │   ├── ant.properties.sample   ← signing config (NO password; see "Signing")
 │   └── res/                    ← adaptive icon, colors.xml, strings.xml ("Decent")
@@ -24,7 +24,8 @@ misc/android/
     ├── 03-zipfs-raise-archive-cap.patch
     ├── 04-sdl2tk-dirty-rect-upload.patch
     ├── 05-androidx-migration.patch
-    └── 06-prune-unused-tcl-packages.sh
+    ├── 06-prune-unused-tcl-packages.sh
+    └── 07-gnss-guard-and-updater-icon.patch
 ```
 
 ## Prerequisites (host: macOS)
@@ -48,7 +49,7 @@ git clone https://github.com/charwliu/androwish AWtree && cd AWtree
 git checkout f73cb8be
 
 # 2) apply the engine mods
-for p in "$M"/mods/0[1-5]*.patch; do patch -p1 < "$p"; done
+for p in "$M"/mods/0[1-57]*.patch; do patch -p1 < "$p"; done
 sh "$M"/mods/06-prune-unused-tcl-packages.sh          # trim unused Tcl packages
 
 # 3) overlay the de1app packaging (gradle, manifest, icon, strings, signing)

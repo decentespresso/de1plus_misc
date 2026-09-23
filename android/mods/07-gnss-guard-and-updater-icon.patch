@@ -1,0 +1,133 @@
+--- a/src/tk/tcl/wish/AndroWish.java
++++ b/src/tk/tcl/wish/AndroWish.java
+@@ -125,10 +125,31 @@
+ 	    mLocationMgr = (LocationManager)
+ 		getSystemService(Context.LOCATION_SERVICE);
+ 	    if (mLocationMgr != null) {
+-		mGpsInfo = new GpsInfo(this);
+-		mLocationMgr.addGpsStatusListener(mGpsInfo);
+-		mNmeaInfo = new NmeaInfo(this);
+-		mLocationMgr.addNmeaListener(mNmeaInfo);
++		/*
++		 * The legacy GpsStatus/NMEA listener APIs are deprecated, and on
++		 * Android 12+ devices without the legacy GNSS HAL bridge they
++		 * THROW UnsupportedOperationException ("please use GnssStatus
++		 * APIs instead") instead of being no-ops. That happens here in
++		 * onCreate, before any Tcl runs, so it crash-loops the app at
++		 * launch and nothing Tcl-side can recover it. Both calls throw
++		 * identically, so both are guarded; location updates themselves
++		 * still work, only these status/NMEA extras are skipped.
++		 * (Reported as decentespresso/de1app#358 on Android 16.)
++		 */
++		try {
++		    mGpsInfo = new GpsInfo(this);
++		    mLocationMgr.addGpsStatusListener(mGpsInfo);
++		} catch (UnsupportedOperationException e) {
++		    Log.v(TAG, "GpsStatus listener unsupported, skipped");
++		    mGpsInfo = null;
++		}
++		try {
++		    mNmeaInfo = new NmeaInfo(this);
++		    mLocationMgr.addNmeaListener(mNmeaInfo);
++		} catch (UnsupportedOperationException e) {
++		    Log.v(TAG, "NMEA listener unsupported, skipped");
++		    mNmeaInfo = null;
++		}
+ 	    }
+ 	}
+ 	mLocations = new HashMap<String, Location>();
+@@ -354,11 +375,19 @@
+ 	    mBDRecvr = null;
+ 	}
+ 	if (mGpsInfo != null) {
+-	    mLocationMgr.removeGpsStatusListener(mGpsInfo);
++	    try {
++		mLocationMgr.removeGpsStatusListener(mGpsInfo);
++	    } catch (UnsupportedOperationException e) {
++		/* legacy GpsStatus API absent, see onCreate */
++	    }
+ 	    mGpsInfo = null;
+ 	}
+ 	if (mNmeaInfo != null) {
+-	    mLocationMgr.removeNmeaListener(mNmeaInfo);
++	    try {
++		mLocationMgr.removeNmeaListener(mNmeaInfo);
++	    } catch (UnsupportedOperationException e) {
++		/* legacy NMEA API absent, see onCreate */
++	    }
+ 	    mNmeaInfo = null;
+ 	}
+ 	if (mLocationMgr != null) {
+--- /dev/null
++++ b/src/tk/tcl/wish/DecentUpdater.java
+@@ -0,0 +1,70 @@
++/*
++ * DecentUpdater -- second launcher icon for the Decent APK.
++ *
++ * de1plus/appupdate.tcl is a standalone, deliberately lean updater: it can
++ * re-download the app when the main app is too broken to start. That is only
++ * useful if the user can actually START it, so this activity gives it its own
++ * icon in the app drawer, next to Decent itself.
++ *
++ * It runs appupdate.tcl the same way any Tcl script is run on AndroWish: hand
++ * AndroWishLauncher an "arg" extra with the script path, and it dispatches to a
++ * free AndroWishScriptN process.
++ *
++ * The script lives in the WRITABLE copy of the bundle, which
++ * ::de1_redirect_data_root (google_play_store.tcl) creates on first run at
++ * $HOME/Documents/Decent, where AndroWish's HOME is the app's internal storage
++ * (SDL_AndroidGetInternalStoragePath = getFilesDir()). Before that first run
++ * there is nothing to launch, so we say so rather than starting a broken
++ * interpreter.
++ */
++package tk.tcl.wish;
++
++import android.app.Activity;
++import android.content.Intent;
++import android.os.Bundle;
++import android.util.Log;
++import android.widget.Toast;
++
++import java.io.File;
++
++public class DecentUpdater extends Activity {
++
++    private static final String TAG = "DecentUpdater";
++
++    /* Candidate locations of the updater script, most likely first. */
++    private static final String[] CANDIDATES = {
++	"Documents/Decent/appupdate.tcl",
++	"Documents/Decent/de1plus/appupdate.tcl",
++	"Documents/de1app/appupdate.tcl",
++    };
++
++    @Override
++    public void onCreate(Bundle savedInstanceState) {
++	super.onCreate(savedInstanceState);
++
++	String script = null;
++	for (String candidate : CANDIDATES) {
++	    File f = new File(getFilesDir(), candidate);
++	    if (f.exists()) {
++		script = f.getAbsolutePath();
++		break;
++	    }
++	}
++
++	if (script == null) {
++	    Log.v(TAG, "*** no appupdate.tcl found under " + getFilesDir());
++	    Toast.makeText(this,
++		"Start Decent once first, then the updater is available.",
++		Toast.LENGTH_LONG).show();
++	    finish();
++	    return;
++	}
++
++	Log.v(TAG, "*** launching " + script);
++	Intent intent = new Intent(Intent.ACTION_VIEW, null, this,
++				   tk.tcl.wish.AndroWishLauncher.class);
++	intent.putExtra("arg", script);
++	startActivity(intent);
++	finish();
++    }
++}

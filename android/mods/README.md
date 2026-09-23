@@ -13,5 +13,6 @@ when rebuilding the native libs.
 | `04-sdl2tk-dirty-rect-upload.patch` | `jni/sdl2tk/sdl/SdlTkGfx.c`: per-rect texture upload on Android | ~25–40 % less per-frame upload during a shot |
 | `05-androidx-migration.patch` | `src/tk/tcl/wish/AndroWish.java`: `android.support.v4` → `androidx.core` | builds against modern SDK 35 |
 | `06-prune-unused-tcl-packages.sh` | removes ~1,795 files of unused AndroWish "batteries" from `assets/` | keeps only the 19 Tcl packages de1app `package require`s |
+| `07-gnss-guard-and-updater-icon.patch` | `AndroWish.java`: guard the legacy `addGpsStatusListener`/`addNmeaListener` calls; new `DecentUpdater.java` | Android 12+ devices without the legacy GNSS HAL throw there and crash-loop the app at launch (issue #358); the new activity gives `appupdate.tcl` its own launcher icon |
 
 Also published standalone at `johnbuckman/androwish-android-improvements`.
