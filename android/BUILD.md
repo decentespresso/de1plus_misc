@@ -25,7 +25,9 @@ misc/android/
     ├── 04-sdl2tk-dirty-rect-upload.patch
     ├── 05-androidx-migration.patch
     ├── 06-prune-unused-tcl-packages.sh
-    └── 07-gnss-guard-and-updater-icon.patch
+    ├── 07-gnss-guard-and-updater-icon.patch
+    ├── 08-ble-scan-securityexception.patch
+    └── 08-rebuild-ble-jar.sh          ← libs/ble.jar is prebuilt: rebuild it after patch 08
 ```
 
 ## Prerequisites (host: macOS)
@@ -41,6 +43,7 @@ misc/android/
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 export ANDROID_HOME=~/Library/Android/sdk
 export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.3.13750724
+export PATH="$ANDROID_NDK_HOME:$PATH"   # gradle's preBuild runs ndk-build from PATH
 DE1=/d/admin/code/de1app/de1plus          # de1plus source (this repo)
 M=/d/admin/code/de1app/misc/android
 
@@ -49,7 +52,8 @@ git clone https://github.com/charwliu/androwish AWtree && cd AWtree
 git checkout f73cb8be
 
 # 2) apply the engine mods
-for p in "$M"/mods/0[1-57]*.patch; do patch -p1 < "$p"; done
+for p in "$M"/mods/0[1-578]*.patch; do patch -p1 < "$p"; done
+sh "$M"/mods/08-rebuild-ble-jar.sh                     # patch 08 is in ble/src; ship it in libs/ble.jar
 sh "$M"/mods/06-prune-unused-tcl-packages.sh          # trim unused Tcl packages
 
 # 3) overlay the de1app packaging (gradle, manifest, icon, strings, signing)

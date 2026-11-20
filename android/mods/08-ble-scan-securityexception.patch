@@ -1,0 +1,42 @@
+08: don't crash on BLE scan results when BLUETOOTH_CONNECT is missing (2026-11)
+
+On Android 12+, BluetoothDevice.getName()/getType() need BLUETOOTH_CONNECT.
+BLEClient.onLeScan called them unguarded on a binder thread, so a scan with
+only BLUETOOTH_SCAN granted threw an uncaught SecurityException and killed
+the app on Search (Galaxy Tab A7 Lite, Android 14, de1app 1.46.1.215).
+The device is now reported without a name instead. The Tcl side
+(de1app#378) also stops scanning without the permission.
+
+libs/ble.jar is a PREBUILT jar of this source: after applying this patch,
+run mods/08-rebuild-ble-jar.sh or the fix is not in the APK.
+
+--- a/ble/src/tk/tcl/wish/BLEClient.java	2026-11-20 12:52:17
++++ b/ble/src/tk/tcl/wish/BLEClient.java	2026-11-20 12:52:17
+@@ -769,10 +769,24 @@
+ 
+     public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+ 	if (device != null) {
++	    /*
++	     * Android 12+: getName() (and getType()) need BLUETOOTH_CONNECT.
++	     * Without it they throw SecurityException on this binder thread,
++	     * which is uncaught and kills the app. Report the device without
++	     * a name instead (Decent, 2026-11: crash on Search).
++	     */
++	    String name = null;
++	    int type = BluetoothDevice.DEVICE_TYPE_UNKNOWN;
++	    try {
++		name = device.getName();
++		type = device.getType();
++	    } catch (SecurityException e) {
++		Log.w("BLEClient", "scan callback: no BLUETOOTH_CONNECT, " +
++		      "can't read device name: " + e);
++	    }
+ 	    Log.i("BLEClient", "scan callback: " + device.getAddress() + " " +
+-		  device.getName());
+-	    nativeScanResult(id, device.getAddress(), device.getName(),
+-			     device.getType(), rssi);
++		  name);
++	    nativeScanResult(id, device.getAddress(), name, type, rssi);
+ 	}
+     }
+ 
