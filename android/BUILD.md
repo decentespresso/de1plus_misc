@@ -27,7 +27,8 @@ misc/android/
     ├── 06-prune-unused-tcl-packages.sh
     ├── 07-gnss-guard-and-updater-icon.patch
     ├── 08-ble-scan-securityexception.patch
-    └── 08-rebuild-ble-jar.sh          ← libs/ble.jar is prebuilt: rebuild it after patch 08
+    ├── 08-rebuild-ble-jar.sh          ← libs/ble.jar is prebuilt: rebuild it after patch 08
+    └── 09-file-uri-to-content-uri.patch  ← borg activity file:// → FileProvider content:// (APK installs, e.g. Decaid)
 ```
 
 ## Prerequisites (host: macOS)
@@ -52,7 +53,7 @@ git clone https://github.com/charwliu/androwish AWtree && cd AWtree
 git checkout f73cb8be
 
 # 2) apply the engine mods
-for p in "$M"/mods/0[1-578]*.patch; do patch -p1 < "$p"; done
+for p in "$M"/mods/0[1-5789]*.patch; do patch -p1 < "$p"; done
 sh "$M"/mods/08-rebuild-ble-jar.sh                     # patch 08 is in ble/src; ship it in libs/ble.jar
 sh "$M"/mods/06-prune-unused-tcl-packages.sh          # trim unused Tcl packages
 

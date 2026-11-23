@@ -1,0 +1,41 @@
+--- a/src/tk/tcl/wish/AndroWish.java	2026-11-23 18:43:28
++++ b/src/tk/tcl/wish/AndroWish.java	2026-11-23 18:43:28
+@@ -997,11 +997,38 @@
+ 	return r.toString();
+     }
+ 
++    /*
++     * Since Android 7 (API 24) handing a file:// URI to another app throws
++     * FileUriExposedException, and the package installer can't read our
++     * private files anyway. Share files under files/ and cache/ through the
++     * FileProvider declared in the manifest (authority <package>.fileprovider)
++     * and grant the receiving app read access. Paths outside those folders,
++     * or any failure, leave the original URI unchanged.
++     */
++    static Uri fileUriToContentUri(Intent i, Uri uri) {
++	if ((uri == null) || !"file".equals(uri.getScheme()) ||
++	    (Build.VERSION.SDK_INT < 24) || (mSingleton == null)) {
++	    return uri;
++	}
++	try {
++	    Context ctx = mSingleton.getContext();
++	    Uri content = androidx.core.content.FileProvider.getUriForFile(ctx,
++			ctx.getPackageName() + ".fileprovider",
++			new File(uri.getPath()));
++	    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
++	    return content;
++	} catch (Exception e) {
++	    Log.v(TAG, "fileUriToContentUri: keeping " + uri + ": " + e.toString());
++	    return uri;
++	}
++    }
++
+     static Intent buildIntent(Intent i, String uristr, String type,
+ 			      String[] cats, String[] comp) {
+ 	Uri uri = null;
+ 	if ((uristr != null) && (uristr.length() > 0)) {
+ 	    uri = Uri.parse(uristr);
++	    uri = fileUriToContentUri(i, uri);
+ 	}
+ 	if ((type != null) && (type.length() == 0)) {
+ 	    type = null;

@@ -98,7 +98,23 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <!-- Shares files under the app's files/ and cache/ folders as content:// URIs, so borg activity can hand a
+         downloaded APK (e.g. Decaid) to the package installer. AndroWish.buildIntent converts file:// URIs. -->
+    <provider android:name="androidx.core.content.FileProvider"
+              android:authorities="${applicationId}.fileprovider"
+              android:exported="false"
+              android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                 android:resource="@xml/de1app_file_paths" />
+    </provider>
   </application>
+
+  <!-- Decaid installer: install a downloaded APK, and see whether Decaid (net.tadel.reaprime) is installed
+       (Android 11+ hides other packages unless they are listed here). -->
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+  <queries>
+    <package android:name="net.tadel.reaprime" />
+  </queries>
 
   <!-- OpenGL ES 2.0 -->
   <uses-feature android:glEsVersion="0x00020000" />
