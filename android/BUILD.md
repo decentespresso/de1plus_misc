@@ -28,7 +28,8 @@ misc/android/
     ├── 07-gnss-guard-and-updater-icon.patch
     ├── 08-ble-scan-securityexception.patch
     ├── 08-rebuild-ble-jar.sh          ← libs/ble.jar is prebuilt: rebuild it after patch 08
-    └── 09-file-uri-to-content-uri.patch  ← borg activity file:// → FileProvider content:// (APK installs, e.g. Decaid)
+    ├── 09-file-uri-to-content-uri.patch  ← borg activity file:// → FileProvider content:// (APK installs, e.g. Decaid)
+    └── 10-16k-page-size.patch        ← 16 KB-aligned native libs (Android 15+ 16 KB-page devices, Google Play)
 ```
 
 ## Prerequisites (host: macOS)
@@ -53,7 +54,7 @@ git clone https://github.com/charwliu/androwish AWtree && cd AWtree
 git checkout f73cb8be
 
 # 2) apply the engine mods
-for p in "$M"/mods/0[1-5789]*.patch; do patch -p1 < "$p"; done
+for p in "$M"/mods/[0-9][0-9]-*.patch; do patch -p1 < "$p"; done   # 01..10, in order (06 is a .sh)
 sh "$M"/mods/08-rebuild-ble-jar.sh                     # patch 08 is in ble/src; ship it in libs/ble.jar
 sh "$M"/mods/06-prune-unused-tcl-packages.sh          # trim unused Tcl packages
 
@@ -102,7 +103,16 @@ security add-generic-password -a key   -s androwish-release-keystore -w '<pw>' -
 - **Seed contents** are controlled by `build-de1app-seed.sh` env vars
   (`SEED_SKINS` / `SEED_SKIN_RES` / `SEED_FONTS`); default = the 7 "most popular"
   skins (machine.tcl:439) at 2560×1600 + all fonts, everything else self-updates.
-- **Engine rebuild** (mods 01–05) needs the full androwish source + NDK. Day-to-day
+- **16 KB pages (patch 10):** every `.so` in `libs/arm64-v8a/` must have 16 KB-aligned
+  LOAD segments, or 16 KB-page devices (Android 15+, emulator images `*_ps16k` /
+  `sdk_gphone16k_arm64`) crash at launch (`dlopen … empty/missing DT_HASH/DT_GNU_HASH`,
+  then `UnsatisfiedLinkError … nativeInit`). After changing build flags, rebuild the
+  engine from clean (`rm -rf obj/local/arm64-v8a`; `cd jni && ndk-build -j10
+  NDK_APPLICATION_MK=Application64.mk` is much faster than gradle's serial build). Check:
+  `for f in libs/arm64-v8a/*.so; do llvm-readelf -lW $f | awk '/LOAD/{print $NF}'; done | sort | uniq -c`
+  → only `0x4000`. The libs are stored compressed (minSdk 21 ⇒ extracted at install), so
+  APK zip alignment does not matter; `zipalign -c -P 16 -v 4` passes anyway.
+- **Engine rebuild** (mods 01–05, 10) needs the full androwish source + NDK. Day-to-day
   APK changes (skins, seed, icon, Tcl) do NOT — only steps 3–6.
 - The engine patches are also published standalone at
   `johnbuckman/androwish-android-improvements`.
