@@ -100,9 +100,14 @@ security add-generic-password -a key   -s androwish-release-keystore -w '<pw>' -
 ## Notes
 - **Bump `versionCode`** in `overlay/build.gradle` for every published build (the
   launcher caches the icon by versionCode).
-- **Seed contents** are controlled by `build-de1app-seed.sh` env vars
-  (`SEED_SKINS` / `SEED_SKIN_RES` / `SEED_FONTS`); default = the 7 "most popular"
-  skins (machine.tcl:439) at 2560×1600 + all fonts, everything else self-updates.
+- **Seed contents:** `build-de1app-seed.sh` copies ONLY the files listed by
+  `de1plus/misc.tcl` (`make_de1_dir`, the distribution manifest), so no developer
+  state (settings.tdb etc.) can leak into the APK. It then keeps a subset, set by
+  env vars `SEED_SKINS` (default: the "most popular" skins + Streamline/Streamline
+  Dark + default), `SEED_SKIN_RES` (default 2560x1600) and `SEED_SAVER` (default 0,
+  no screensaver); everything else self-updates. It stamps `version.tcl`,
+  `build-info.txt` and `build_id.txt` from `git describe` of the de1app checkout
+  that `SRC_DE1PLUS` sits in, so seed from a clean checkout for a release.
 - **16 KB pages (patch 10):** every `.so` in `libs/arm64-v8a/` must have 16 KB-aligned
   LOAD segments, or 16 KB-page devices (Android 15+, emulator images `*_ps16k` /
   `sdk_gphone16k_arm64`) crash at launch (`dlopen … empty/missing DT_HASH/DT_GNU_HASH`,
